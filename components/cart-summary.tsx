@@ -4,9 +4,9 @@ import { useCartStore } from "@/lib/store"
 import { formatCurrency } from "@/lib/utils"
 
 export function CartSummary() {
-  const { items } = useCartStore()
+  const { getTotal } = useCartStore()
 
-  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0)
+  const subtotal = getTotal()
 
   const deliveryFee = subtotal > 0 ? 2.99 : 0
   const total = subtotal + deliveryFee

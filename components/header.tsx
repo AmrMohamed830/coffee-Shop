@@ -11,10 +11,10 @@ import { cn } from "@/lib/utils"
 
 export function Header() {
   const pathname = usePathname()
-  const { items } = useCartStore()
+  const { getCartItemCount } = useCartStore()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0)
+  const totalItems = getCartItemCount()
 
   const routes = [
     { href: "/", label: "Home" },
