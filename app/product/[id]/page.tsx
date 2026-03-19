@@ -2,210 +2,141 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useOrderStore } from "@/lib/orderStore" // تغيير: استخدام مخزن المنتجات الجديد
+import { useParams, useRouter } from "next/navigation"
+import { useOrderStore } from "@/lib/orderStore"
 import { useCartStore } from "@/lib/store"
-import type { FoodItem, Size } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-// @ts-ignore - للتعامل مع مسار الاستيراد المختلف
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { formatCurrency, formatImagePath } from "@/lib/utils"
-import { Separator } from "@/components/ui/separator"
-import { notFound } from "next/navigation"
+import { ChevronLeft } from "lucide-react"
+import type { Product, Size } from "@/lib/types"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const [item, setItem] = useState<FoodItem | null>(null)
+export default function ProductPage() {
+  const params = useParams()
+  const router = useRouter()
+  const { products, initListener, initialized } = useOrderStore()
+  const { addToCart } = useCartStore()
+  const { toast } = useToast()
+
+  const [product, setProduct] = useState<Product | null>(null)
   const [selectedSize, setSelectedSize] = useState<Size | null>(null)
   const [loading, setLoading] = useState(true)
-  const { products, initListener } = useOrderStore() // تغيير: جلب المنتجات من المخزن الصحيح
-  // @ts-ignore - التعامل مع اختلاف تسمية الدالة في الستور
-  const cartStore = useCartStore()
-  // @ts-ignore
-  const addFunction = cartStore.addItem || cartStore.addToCart
-  // @ts-ignore
-  const { toast } = useToast() || { toast: console.log }
 
+  const productId = Array.isArray(params.id) ? params.id[0] : params.id
   useEffect(() => {
-    initListener()
-  }, [initListener])
+    if (products.length > 0 && productId) {
+      const foundProduct = products.find((p) => p.id === productId);
 
-  useEffect(() => {
-    setLoading(true)
-    // @ts-ignore - The product from the store now has a more complex shape
-    const product = products.find((p) => p.id === params.id)
-    
-    if (product) {
-      let foodItem: FoodItem
+      if (foundProduct && foundProduct.sizes && typeof foundProduct.sizes === 'object' && !Array.isArray(foundProduct.sizes)) {
+        // Transform the sizes object into an array of Size objects
+        const transformedSizes: Size[] = Object.entries(foundProduct.sizes)
+          .map(([name, sizeData]: [string, any]) => ({
+            name: name as "50g" | "100g" | "250g",
+            price: sizeData.price,
+            images: [sizeData.image], // The type expects an array of strings
+          }))
+          .sort((a, b) => parseInt(a.name) - parseInt(b.name)); // Sort by gram value
 
-      // Check if the product has the new detailed 'sizes' object structure
-      // @ts-ignore
-      if (product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes)) {
-        // تحديد الترتيب المفضل للأحجام
-        const sizeOrder = ["50g", "100g", "250g"];
-        const foodItemSizes: Size[] = [];
-
-        // محاولة جلب الأحجام بالترتيب المحدد
-        sizeOrder.forEach(key => {
-            // @ts-ignore
-            const sizeDetails = product.sizes[key];
-            // عرض الحجم فقط إذا كان له سعر محدد (أكبر من 0)
-            if (sizeDetails && Number(sizeDetails.price) > 0) {
-                foodItemSizes.push({
-                    name: key as Size["name"],
-                    price: Number(sizeDetails.price),
-                    images: [sizeDetails.image || "/placeholder.svg"],
-                });
-            }
-        });
-
-        // في حالة عدم العثور على الأحجام القياسية، نجلب أي أحجام أخرى موجودة
-        if (foodItemSizes.length === 0) {
-             Object.entries(product.sizes).forEach(([key, val]: [string, any]) => {
-                 if (val && Number(val.price) > 0) {
-                     foodItemSizes.push({
-                         name: key as Size["name"],
-                         price: Number(val.price),
-                         images: [val.image || "/placeholder.svg"]
-                     })
-                 }
-             })
+        if (transformedSizes.length > 0) {
+          // Create a new product object with the transformed sizes array
+          const productWithTransformedSizes = {
+            ...foundProduct,
+            sizes: transformedSizes,
+          };
+          setProduct(productWithTransformedSizes);
+          setSelectedSize(transformedSizes[0]);
         }
-
-        foodItem = {
-          id: product.id,
-          name: product.name,
-          // @ts-ignore
-          description: product.description || product.category,
-          // @ts-ignore
-          categoryId: product.categoryId || product.category,
-          featured: false,
-          // @ts-ignore
-          roastLevel: product.roastLevel || "وسط",
-          sizes: foodItemSizes,
-        };
-      } else {
-        // Fallback for old/simple product structure
-        foodItem = {
-          id: product.id,
-          name: product.name,
-          description: product.category,
-          categoryId: product.category,
-          featured: false,
-          roastLevel: "وسط",
-          sizes: [{ name: "100g", price: product.price, images: [product.image] }],
-        };
       }
-      
-      setItem(foodItem)
-      // تعيين الحجم الافتراضي (يفضل 100g إذا وجد، وإلا أول حجم متاح)
-      if (foodItem.sizes.length > 0) {
-        const defaultSize = foodItem.sizes.find(s => s.name === "100g") || foodItem.sizes[0];
-        setSelectedSize(defaultSize)
-      }
+      setLoading(false);
     }
-    setLoading(false)
-  }, [params.id, products])
+  }, [products, productId]);
 
   const handleAddToCart = () => {
-    if (item && selectedSize && addFunction) {
-      // The cart expects a 'size' property on the top-level item
-      addFunction({ ...item, quantity: 1, size: selectedSize.name })
-      if (toast) {
-        toast({
-          title: "تمت الإضافة للسلة",
-          description: `تمت إضافة ${item.name} (${selectedSize.name}) إلى سلتك.`,
-        })
-      }
+    if (product && selectedSize) {
+      addToCart({
+        ...product, // Pass all product properties to the cart item
+        price: selectedSize.price, // Override with the selected size's price
+        size: selectedSize.name,   // Set the selected size name
+        quantity: 1,
+      });
+
+      toast({
+        title: "تمت الإضافة إلى السلة",
+        description: `${product.name} (${selectedSize.name})`,
+        variant: "success",
+      });
     }
-  }
+  };
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 text-center">
         <p>Loading product...</p>
       </div>
-    )
+    );
   }
 
-  if (!item) {
-    // If you have a custom 404 page, Next.js will render it
-    notFound()
-    return null // notFound() doesn't abort rendering, so we must return null
+  if (!product || !selectedSize) {
+    return (
+      <div className="container mx-auto px-4 py-6 text-center">
+        <h2 className="text-2xl font-bold">Product not found or not available</h2>
+        <Button onClick={() => router.back()} className="mt-4">Go Back</Button>
+      </div>
+    );
   }
-  
-  const rawImage = selectedSize?.images[0] || item.sizes[0]?.images[0] || "/placeholder.svg";
-  const displayImage = formatImagePath(rawImage);
+
+  // The image is now in an array, so we get the first element.
+  const displayImage = selectedSize.images[0] ?? product.image;
 
   return (
-    <div className="container mx-auto px-4 py-8" dir="rtl">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div>
-          <div className="relative aspect-square rounded-xl overflow-hidden border shadow-sm bg-white">
-            <Image
-              src={displayImage}
-              alt={item.name}
-              fill
-              className="object-cover transition-all duration-500 ease-in-out"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-          </div>
+    <main className="container mx-auto px-4 py-6">
+      <div className="mb-4">
+        <Button variant="ghost" onClick={() => router.back()} className="text-muted-foreground">
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Back to Menu
+        </Button>
+      </div>
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
+          <Image
+            src={formatImagePath(displayImage)}
+            alt={product.name}
+            fill
+            className="object-cover"
+            priority
+            unoptimized
+          />
         </div>
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-black text-primary">{item.name}</h1>
-            <p className="text-muted-foreground mt-2 text-lg leading-relaxed">{item.description}</p>
-          </div>
 
-          <Separator />
-
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold">اختر الحجم (الوزن)</h2>
-            <RadioGroup
-              value={selectedSize?.name}
-              onValueChange={(value) => {
-                const newSize = item.sizes.find((s) => s.name === value)
-                if (newSize) setSelectedSize(newSize)
-              }}
-              className="grid gap-3"
-            >
-              {item.sizes.map((size) => (
-                <Label
-                  key={size.name}
-                  htmlFor={size.name}
-                  className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    selectedSize?.name === size.name
-                      ? "border-primary bg-primary/5 shadow-md scale-[1.02]"
-                      : "border-transparent bg-secondary/20 hover:bg-secondary/30"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <RadioGroupItem value={size.name} id={size.name} className="text-primary" />
-                    <span className="font-bold text-lg">{size.name}</span>
-                  </div>
-                  <span className="text-xl font-black text-primary">{formatCurrency(size.price)}</span>
-                </Label>
-              ))}
-            </RadioGroup>
-          </div>
+        <div className="flex flex-col justify-center" dir="rtl">
+          <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
+          <p className="text-muted-foreground mt-2">{product.category}</p>
           
-          <Separator />
+          <p className="text-3xl font-bold my-4">{formatCurrency(selectedSize?.price ?? 0)}</p>
 
-          {item.roastLevel && (
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold">درجة التحميص:</h2>
-              <span className="px-3 py-1 bg-secondary/20 rounded-full text-primary font-medium">{item.roastLevel}</span>
+          <div>
+            <h3 className="text-sm font-semibold mb-2">الحجم</h3>
+            <div className="flex gap-2">
+              {product.sizes.map((size) => (
+                <Button
+                  key={size.name}
+                  variant={selectedSize?.name === size.name ? "default" : "outline"}
+                  onClick={() => setSelectedSize(size)}
+                  className="flex-1 md:flex-auto"
+                >
+                  {size.name}
+                </Button>
+              ))}
             </div>
-          )}
+          </div>
 
-          <div className="pt-4">
-            <Button onClick={handleAddToCart} size="lg" className="w-full text-lg font-bold py-6 rounded-xl shadow-lg hover:scale-[1.02] transition-transform">
-              إضافة للسلة - {selectedSize ? formatCurrency(selectedSize.price) : ''}
+          <div className="mt-6">
+            <Button size="lg" className="w-full" onClick={handleAddToCart}>
+              أضف إلى السلة
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

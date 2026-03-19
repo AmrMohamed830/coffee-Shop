@@ -1,19 +1,7 @@
 import { create } from "zustand"
 import { db } from "../config/firebase"
-import { collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore"
-import type { Order, OrderStatus } from "./types"
-
-export interface Product {
-  id: string
-  name: string
-  price: number
-  image: string
-  category: string
-  sizes?: any
-  description?: string
-  categoryId?: string
-  roastLevel?: string
-}
+import { collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, arrayUnion } from "firebase/firestore"
+import type { Order, OrderStatus, Product } from "@/lib/types"
 
 interface OrderState {
   orders: Order[]
@@ -22,8 +10,8 @@ interface OrderState {
   initialized: boolean
   initListener: () => void
   addOrder: (order: Order) => Promise<void>
-  updateOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>
-  addProduct: (product: Product) => Promise<void>
+  updateOrderStatus: (orderId: string, status: OrderStatus, user?: { uid: string; name: string }) => Promise<void>
+  addProduct: (product: Omit<Product, 'id'>) => Promise<void>
   removeProduct: (productId: string) => Promise<void>
   updateProduct: (product: Product) => Promise<void>
 }
@@ -86,14 +74,25 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
     }
   },
 
-  updateOrderStatus: async (orderId, status) => {
+  updateOrderStatus: async (orderId, status, user) => {
     try {
       const orderRef = doc(db, "orders", orderId);
       const isCompleted = status === 'مكتمل';
-      await updateDoc(orderRef, {
+      
+      const updateData: any = {
         status,
         ...(isCompleted ? { completedAt: new Date().toISOString() } : {})
-      });
+      };
+
+      if (user) {
+        updateData.statusHistory = arrayUnion({
+          status,
+          updatedAt: new Date().toISOString(),
+          updatedBy: user
+        });
+      }
+
+      await updateDoc(orderRef, updateData);
     } catch (e) {
       console.error("Error updating order status: ", e);
     }
@@ -101,7 +100,8 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
 
   addProduct: async (product) => {
     try {
-      await setDoc(doc(db, "products", product.id), product);
+      const newId = doc(collection(db, "products")).id;
+      await setDoc(doc(db, "products", newId), product);
     } catch (e) {
       console.error("Error adding product: ", e);
     }

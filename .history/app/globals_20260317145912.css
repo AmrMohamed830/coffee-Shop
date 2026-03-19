@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 33% 96%;
+    --foreground: 24 35% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 24 35% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 35% 15%;
+    --primary: 24 45% 30%;
+    --primary-foreground: 40 33% 98%;
+    --secondary: 30 30% 90%;
+    --secondary-foreground: 24 45% 20%;
+    --muted: 35 25% 92%;
+    --muted-foreground: 25 20% 45%;
+    --accent: 28 40% 85%;
+    --accent-foreground: 24 35% 15%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 25% 85%;
+    --input: 30 25% 85%;
+    --ring: 24 45% 30%;
+    --radius: 0.5rem;
+    --chart-1: 22 100% 50%;
+    --chart-2: 240 5.9% 10%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 22 100% 50%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 22 100% 50%;
+    --chart-1: 22 100% 60%;
+    --chart-2: 0 0% 80%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

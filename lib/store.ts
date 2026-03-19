@@ -1,12 +1,12 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import type { CartItem } from "./types"
+import type { OrderItem } from "@/lib/types"
 
 interface CartState {
-  items: CartItem[]
-  addToCart: (item: CartItem) => void
-  updateItemQuantity: (id: string, size: CartItem['size'], quantity: number) => void
-  removeItem: (id: string, size: CartItem['size']) => void
+  items: OrderItem[]
+  addToCart: (item: OrderItem) => void
+  updateItemQuantity: (id: string, size: OrderItem['size'], quantity: number) => void
+  removeItem: (id: string, size: OrderItem['size']) => void
   clearCart: () => void
   getTotal: () => number
   getCartItemCount: () => number
@@ -66,9 +66,8 @@ export const useCartStore = create<CartState>()(
 
       getTotal: () => {
         return get().items.reduce((total, item) => {
-          // Find the price for the specific size of the item
-          const sizeDetails = item.sizes?.find(s => s.name === item.size);
-          const price = sizeDetails ? sizeDetails.price : 0;
+          // Use the price directly from the item (which we set correctly when adding to cart)
+          const price = item.price || 0;
           return total + price * item.quantity;
         }, 0);
       },

@@ -14,9 +14,22 @@ export interface FoodItem {
   roastLevel: "فاتح" | "وسط" | "غامق (محروق)"
 }
 
-export interface CartItem extends FoodItem {
+export interface OrderItem extends FoodItem {
   quantity: number
   size: Size["name"]
+  price: number
+}
+
+export interface Product {
+  id: string
+  name: string
+  price: number
+  image?: string
+  category: string
+  sizes?: any
+  description?: string
+  categoryId?: string
+  roastLevel?: string
 }
 
 export interface Category {
@@ -35,7 +48,7 @@ export interface Order {
     address: string
     notes?: string
   }
-  items: CartItem[]
+  items: OrderItem[]
   total: number
   status: OrderStatus
   createdAt?: string | Date
