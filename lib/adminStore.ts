@@ -14,6 +14,7 @@ interface AdminState {
   promoSubtitle: string;
   promoImage: string;
   isPromoVisible: boolean;
+  isPromoLoading: boolean;
   listenToPromoBanner: () => () => void;
   initAuthListener: () => () => void;
   toggleAdminMode: () => void;
@@ -33,6 +34,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   promoSubtitle: "استخدم كود \"أهلاً20\" عند الدفع للحصول على خصم خاص.",
   promoImage: "",
   isPromoVisible: true,
+  isPromoLoading: true,
 
   setPromoText: async (title: string, subtitle: string, image: string, isVisible: boolean) => {
     try {
@@ -52,9 +54,15 @@ export const useAdminStore = create<AdminState>((set, get) => ({
           promoTitle: data.title ?? "استمتع بخصم 20% على أول طلب!",
           promoSubtitle: data.subtitle ?? "استخدم كود \"أهلاً20\" عند الدفع للحصول على خصم خاص.",
           promoImage: data.image ?? "",
-          isPromoVisible: data.isVisible ?? true
+          isPromoVisible: data.isVisible ?? true,
+          isPromoLoading: false
         });
+      } else {
+        set({ isPromoLoading: false });
       }
+    }, (error) => {
+        console.error("Error fetching promo banner:", error);
+        set({ isPromoLoading: false });
     });
     return unsubscribe;
   },

@@ -3,9 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useAdminStore } from "@/lib/adminStore";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function PromoBanner() {
-    const { promoTitle, promoSubtitle, promoImage, isPromoVisible } = useAdminStore();
+    const { promoTitle, promoSubtitle, promoImage, isPromoVisible, isPromoLoading } = useAdminStore();
+
+    if (isPromoLoading) {
+        return (
+            <div className="relative overflow-hidden rounded-lg">
+                <Skeleton className="w-full aspect-[2.5/1] md:aspect-[3.5/1]" />
+            </div>
+        );
+    }
 
     if (!isPromoVisible) {
         return null;

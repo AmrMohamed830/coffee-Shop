@@ -9,7 +9,7 @@ export default function MenuPage() {
 
   return (
     <main className="container mx-auto px-4 py-6 space-y-8">
-      <h1 className="text-3xl font-bold">Our Menu</h1>
+      <h1 className="text-3xl font-bold">منيو بن آسر</h1>
 
       <div className="sticky top-16 z-10 bg-background pt-4 pb-2">
         <FoodCategories

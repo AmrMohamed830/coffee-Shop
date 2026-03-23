@@ -8,19 +8,10 @@ import type { FoodItem, Size } from "@/lib/types"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MessageCircle } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function HomePage() {
-  const { products, initListener } = useOrderStore()
-  const { listenToPromoBanner } = useAdminStore()
-
-  // تشغيل الاستماع لـ Firestore عند فتح الصفحة
-  useEffect(() => {
-    initListener()
-    const unsubscribeBanner = listenToPromoBanner()
-    return () => {
-      unsubscribeBanner()
-    }
-  }, [initListener, listenToPromoBanner])
+  const { products, isProductsLoading } = useOrderStore()
 
   return (
     <main className="container mx-auto px-4 py-6 space-y-8">
@@ -28,7 +19,17 @@ export default function HomePage() {
       
       <section>
         <h2 className="text-2xl font-bold mb-4">أحدث المنتجات</h2>
-        {products.length > 0 ? (
+        {isProductsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="space-y-4">
+                <Skeleton className="aspect-square w-full rounded-xl shadow-sm" />
+                <Skeleton className="h-5 w-3/4 rounded-md" />
+                <Skeleton className="h-4 w-1/2 rounded-md" />
+              </div>
+            ))}
+          </div>
+        ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => {
               // تحويل بيانات المنتج من Firestore لتناسب شكل الكارت

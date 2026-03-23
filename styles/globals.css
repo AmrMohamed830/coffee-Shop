@@ -49,7 +49,7 @@ body {
     --sidebar-ring: 20 60% 38%;
   }
   .dark {
-    --background: 353 42% 32%; /* #722F37 */
+    --background: 20 20% 4%; /* لون أسود مائل للقهوة الداكنة جداً */
     --foreground: 45 40% 94%; /* Light beige for contrast */
     --card: 33 100% 7%; /* #241400 */
     --card-foreground: 45 40% 94%;

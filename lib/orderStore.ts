@@ -8,6 +8,7 @@ interface OrderState {
   products: Product[]
   customers: any[]
   initialized: boolean
+  isProductsLoading: boolean
   initListener: () => void
   addOrder: (order: Order) => Promise<void>
   updateOrderStatus: (orderId: string, status: OrderStatus, user?: { uid: string; name: string }) => Promise<void>
@@ -24,6 +25,7 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
   products: [],
   customers: [],
   initialized: false,
+  isProductsLoading: true,
 
   initListener: () => {
     // Only initialize once
@@ -37,7 +39,10 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
       snapshot.forEach((doc) => {
         productsData.push({ id: doc.id, ...doc.data() } as Product);
       });
-      set({ products: productsData });
+      set({ products: productsData, isProductsLoading: false });
+    }, (error) => {
+      console.error("Error fetching products:", error);
+      set({ isProductsLoading: false });
     });
 
     // Listen to Orders

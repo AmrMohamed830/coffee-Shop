@@ -13,46 +13,63 @@ interface FoodItemGridProps {
 }
 
 export function FoodItemGrid({ category = null, featured = false, limit }: FoodItemGridProps) {
-  const { products } = useOrderStore()
+  const { products, isProductsLoading } = useOrderStore()
   const [items, setItems] = useState<FoodItem[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
+    // تحويل المنتجات من المخزن الجديد (orderStore) إلى الشكل الذي يتوقعه الكارت (FoodItem)
+    let filteredItems: FoodItem[] = products.map((product) => {
+      let foodItemSizes: any[] = [];
+      
+      if (product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes)) {
+        const sizeOrder: any[] = ["50g", "100g", "250g"];
+        sizeOrder.forEach(key => {
+          const sizeData = (product.sizes as Record<string, { price: number; image: string }>)?.[key];
+          if (sizeData && Number(sizeData.price) > 0) {
+            foodItemSizes.push({
+              name: key,
+              price: Number(sizeData.price),
+              images: [sizeData.image || product.image || "/placeholder.svg"],
+            });
+          }
+        });
+      }
 
-    // Simulate API call with setTimeout
-    const timer = setTimeout(() => {
-      // تحويل المنتجات من المخزن الجديد (orderStore) إلى الشكل الذي يتوقعه الكارت (FoodItem)
-      let filteredItems: FoodItem[] = products.map((product) => ({
+      if (foodItemSizes.length === 0) {
+        foodItemSizes = [{ 
+          name: "100g", 
+          price: product.price, 
+          images: [product.image || "/placeholder.svg"] 
+        }];
+      }
+
+      return {
         id: product.id,
         name: product.name,
-        description: product.category,
-        categoryId: product.category,
+        description: product.description || product.category,
+        categoryId: product.categoryId || product.category,
         featured: false,
-        roastLevel: "وسط",
-        sizes: [{ name: "100g", price: product.price, images: [product.image] }]
-      }))
+        roastLevel: (product.roastLevel as any) || "وسط",
+        sizes: foodItemSizes
+      };
+    });
 
-      if (category) {
-        filteredItems = filteredItems.filter((item) => item.categoryId === category)
-      }
+    if (category) {
+      filteredItems = filteredItems.filter((item) => item.categoryId === category)
+    }
 
-      if (featured) {
-        filteredItems = filteredItems.filter((item) => item.featured)
-      }
+    if (featured) {
+      filteredItems = filteredItems.filter((item) => item.featured)
+    }
 
-      if (limit) {
-        filteredItems = filteredItems.slice(0, limit)
-      }
+    if (limit) {
+      filteredItems = filteredItems.slice(0, limit)
+    }
 
-      setItems(filteredItems)
-      setLoading(false)
-    }, 100)
-
-    return () => clearTimeout(timer)
+    setItems(filteredItems)
   }, [category, featured, limit, products])
 
-  if (loading) {
+  if (isProductsLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {Array.from({ length: 8 }).map((_, index) => (
