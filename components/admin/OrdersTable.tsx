@@ -75,7 +75,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
                 <td className="py-4 px-4 text-[var(--admin-text)] break-all">{order.customer.address}</td>
                 <td className="py-4 px-4 text-sm text-[var(--admin-text)] break-all">{order.items.map(item => `${item.name} (x${item.quantity})`).join(', ')}</td>
                 <td className="py-4 px-4 text-[var(--admin-text)] break-all">{order.customer.notes}</td>
-                <td className="py-4 px-4 text-[var(--admin-text)] break-all">{order.total.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</td>
+                <td className="py-4 px-4 text-[var(--admin-text)] break-all">{order.total.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</td>
                 <td className="py-4 px-4">
                   {isHistoryTable ? (
                     <span className={`px-2 py-1 text-xs font-bold rounded-full ${getStatusColor(order.status)}`}>{order.status}</span>

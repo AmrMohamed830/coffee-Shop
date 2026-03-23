@@ -250,7 +250,7 @@ export function AddProductForm() {
                         <label className="block text-sm font-bold mb-1 text-[var(--admin-text)]">السعر (ج.م)</label>
                         <input
                           type="number"
-                          value={sizes[sizeName].price}
+                          value={sizes[sizeName].price === 0 ? '' : sizes[sizeName].price}
                           onChange={(e) => handleSizePriceChange(e, sizeName)}
                           className="w-full p-2 rounded-md border admin-border text-[var(--admin-text)] bg-white dark:bg-gray-800"
                           placeholder="السعر"

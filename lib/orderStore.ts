@@ -12,7 +12,7 @@ interface OrderState {
   initListener: () => void
   addOrder: (order: Order) => Promise<void>
   updateOrderStatus: (orderId: string, status: OrderStatus, user?: { uid: string; name: string }) => Promise<void>
-  addProduct: (product: Omit<Product, 'id'>) => Promise<void>
+  addProduct: (product: Omit<Product, 'id'> & { id?: string }) => Promise<void>
   removeProduct: (productId: string) => Promise<void>
   updateProduct: (product: Product) => Promise<void>
 }
@@ -37,7 +37,7 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
     unsubscribeProducts = onSnapshot(productsRef, (snapshot) => {
       const productsData: Product[] = [];
       snapshot.forEach((doc) => {
-        productsData.push({ id: doc.id, ...doc.data() } as Product);
+        productsData.push({ ...doc.data(), id: doc.id } as Product);
       });
       set({ products: productsData, isProductsLoading: false });
     }, (error) => {
@@ -105,8 +105,8 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
 
   addProduct: async (product) => {
     try {
-      const newId = doc(collection(db, "products")).id;
-      await setDoc(doc(db, "products", newId), product);
+      const docId = (product as any).id || doc(collection(db, "products")).id;
+      await setDoc(doc(db, "products", docId), product);
     } catch (e) {
       console.error("Error adding product: ", e);
     }

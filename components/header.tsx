@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useCartStore } from "@/lib/store"
 import { useAdminStore } from "@/lib/adminStore"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 export function Header() {
@@ -16,6 +16,11 @@ export function Header() {
   const { getCartItemCount } = useCartStore()
   const { isAccessGranted, logout } = useAdminStore()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const totalItems = getCartItemCount()
 
@@ -69,16 +74,16 @@ export function Header() {
         )}
           <ThemeToggle />
 
-          <Link href="/cart">
-            <Button variant="outline" size="icon" className="relative">
+          <Button variant="outline" size="icon" className="relative" asChild>
+            <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <p className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+              {isMounted && totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                   {totalItems}
-                </p>
+                </span>
               )}
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
 

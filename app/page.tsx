@@ -84,7 +84,7 @@ export default function HomePage() {
       </section>
 
       {/* سكشن التواصل أسفل الصفحة الرئيسية */}
-      <section className="py-12 flex flex-col items-center justify-center text-center bg-orange-50/50 rounded-2xl border border-orange-100 mt-12" dir="rtl">
+      <section className="py-12 flex flex-col items-center justify-center text-center bg-orange-50/50 dark:bg-orange-950/20 rounded-2xl border border-orange-100 dark:border-orange-900/30 mt-12" dir="rtl">
         <h2 className="text-2xl font-bold text-[#b8682b] mb-4">عندك استفسار أو طلب خاص؟</h2>
         <p className="text-muted-foreground mb-6 max-w-md">إحنا دايماً هنا عشان نسمعك ونظبطلك مزاجك، تواصل معانا في أي وقت.</p>
         <Button asChild size="lg" className="bg-[#b8682b] hover:bg-[#904a17] text-white px-8 py-6 text-lg font-bold rounded-xl shadow-lg transition-transform hover:scale-105 border-none">

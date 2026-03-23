@@ -10,7 +10,7 @@ export function formatCurrency(amount: number): string {
     style: "currency",
     currency: "EGP",
     maximumFractionDigits: 0,
-  }).format(amount)
+  }).format(amount).replace('ج.م.', 'ج.م')
 }
 
 export function formatImagePath(src: string | undefined | null): string {

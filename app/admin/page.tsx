@@ -402,7 +402,7 @@ export default function AdminDashboard() {
                   <div className="p-4 bg-green-100 rounded-2xl text-green-600"><BarChart3 size={32} /></div>
                   <div>
                     <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-1">إجمالي الأرباح</p>
-                    <h3 className="text-2xl font-black text-[var(--admin-text)]">{historyOrders.reduce((acc, order) => acc + (order?.total || 0), 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</h3>
+                    <h3 className="text-2xl font-black text-[var(--admin-text)]">{historyOrders.reduce((acc, order) => acc + (order?.total || 0), 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</h3>
                   </div>
                 </div>
                 <div className="admin-card flex items-center gap-5 p-6 border-l-4 border-orange-500">
@@ -504,7 +504,7 @@ export default function AdminDashboard() {
                       <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl">
                         <p className="text-sm font-bold text-blue-600/80 dark:text-blue-400 mb-1">إجمالي الإيرادات</p>
                         <h4 className="text-3xl font-black text-blue-700 dark:text-blue-300">
-                          {selectedPeriod.total?.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}
+                          {selectedPeriod.total?.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}
                         </h4>
                       </div>
                       <div className="p-5 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 rounded-xl">
@@ -737,7 +737,7 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4 text-[var(--admin-text)]">{order?.customer?.address || '-'}</td>
                         <td className="py-4 px-4 text-sm text-[var(--admin-text)]">{(order?.items || []).map((item: any) => `${item?.name || 'بدون اسم'} (x${item?.quantity || 1})`).join(', ')}</td>
                         <td className="py-4 px-4 text-[var(--admin-text)]">{order?.customer?.notes || '-'}</td>
-                        <td className="py-4 px-4 text-[var(--admin-text)]">{(order?.total || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</td>
+                        <td className="py-4 px-4 text-[var(--admin-text)]">{(order?.total || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</td>
                         <td className="py-4 px-4">
                           <select 
                             value={order?.status || 'جديد'}
@@ -911,7 +911,7 @@ export default function AdminDashboard() {
                           <td className="py-4 px-4 text-[var(--admin-text)]">{order?.customer?.address || '-'}</td>
                           <td className="py-4 px-4 text-sm text-[var(--admin-text)]">{(order?.items || []).map((item: any) => `${item?.name || 'بدون اسم'} (x${item?.quantity || 1})`).join(', ')}</td>
                           <td className="py-4 px-4 text-[var(--admin-text)]">{order?.customer?.notes || '-'}</td>
-                          <td className="py-4 px-4 text-[var(--admin-text)]">{(order?.total || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</td>
+                          <td className="py-4 px-4 text-[var(--admin-text)]">{(order?.total || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</td>
                           <td className="py-4 px-4">
                             <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm font-medium">
                               مكتمل
@@ -1041,7 +1041,7 @@ export default function AdminDashboard() {
                                     <span className="text-xs w-8 font-bold">50g:</span>
                                     <input 
                                       type="number" 
-                                      value={editForm.sizes['50g']} 
+                                      value={editForm.sizes['50g'] === 0 ? '' : editForm.sizes['50g']} 
                                       onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '50g': Number(e.target.value)}})}
                                       className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"
                                     />
@@ -1050,7 +1050,7 @@ export default function AdminDashboard() {
                                     <span className="text-xs w-8 font-bold">100g:</span>
                                     <input 
                                       type="number" 
-                                      value={editForm.sizes['100g']} 
+                                      value={editForm.sizes['100g'] === 0 ? '' : editForm.sizes['100g']} 
                                       onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '100g': Number(e.target.value)}})}
                                       className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"
                                     />
@@ -1059,7 +1059,7 @@ export default function AdminDashboard() {
                                     <span className="text-xs w-8 font-bold">250g:</span>
                                     <input 
                                       type="number" 
-                                      value={editForm.sizes['250g']} 
+                                      value={editForm.sizes['250g'] === 0 ? '' : editForm.sizes['250g']} 
                                       onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '250g': Number(e.target.value)}})}
                                       className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"
                                     />
@@ -1071,14 +1071,14 @@ export default function AdminDashboard() {
                                   {product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes) ? (
                                       <>
                                           {/* @ts-ignore */}
-                                          {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>}
+                                          {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
                                           {/* @ts-ignore */}
-                                          {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>}
+                                          {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
                                           {/* @ts-ignore */}
-                                          {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>}
+                                          {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
                                       </>
                                   ) : (
-                                      Number(product?.price || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })
+                                      Number(product?.price || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')
                                   )}
                               </div>
                           )}

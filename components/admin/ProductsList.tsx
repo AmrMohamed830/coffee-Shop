@@ -68,19 +68,19 @@ export const ProductsList: React.FC<ProductsListProps> = ({
               <td className="py-4 px-4 text-[var(--admin-text)] break-all">
                 {editingId === product.id ? (
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2"><span className="text-xs w-8 font-bold">50g:</span><input type="number" value={editForm.sizes['50g']} onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '50g': Number(e.target.value)}})} className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"/></div>
-                    <div className="flex items-center gap-2"><span className="text-xs w-8 font-bold">100g:</span><input type="number" value={editForm.sizes['100g']} onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '100g': Number(e.target.value)}})} className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"/></div>
-                    <div className="flex items-center gap-2"><span className="text-xs w-8 font-bold">250g:</span><input type="number" value={editForm.sizes['250g']} onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '250g': Number(e.target.value)}})} className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"/></div>
+                    <div className="flex items-center gap-2"><span className="text-xs w-8 font-bold">50g:</span><input type="number" value={editForm.sizes['50g'] === 0 ? '' : editForm.sizes['50g']} onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '50g': Number(e.target.value)}})} className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"/></div>
+                    <div className="flex items-center gap-2"><span className="text-xs w-8 font-bold">100g:</span><input type="number" value={editForm.sizes['100g'] === 0 ? '' : editForm.sizes['100g']} onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '100g': Number(e.target.value)}})} className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"/></div>
+                    <div className="flex items-center gap-2"><span className="text-xs w-8 font-bold">250g:</span><input type="number" value={editForm.sizes['250g'] === 0 ? '' : editForm.sizes['250g']} onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '250g': Number(e.target.value)}})} className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"/></div>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-1 text-sm">
                     {product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes) ? (
                       <>
-                        {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>}
-                        {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>}
-                        {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>}
+                        {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                        {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                        {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
                       </>
-                    ) : (Number(product.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }))}
+                    ) : (Number(product.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م'))}
                   </div>
                 )}
               </td>
