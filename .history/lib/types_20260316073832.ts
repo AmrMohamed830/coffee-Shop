@@ -51,6 +51,6 @@ export interface Order {
   items: OrderItem[]
   total: number
   status: OrderStatus
-  createdAt?: string | number | Date
-  completedAt?: string | number | Date
+  createdAt?: string | Date
+  completedAt?: string | Date
 }

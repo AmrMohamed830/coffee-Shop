@@ -2,25 +2,16 @@
 import { useEffect } from "react"
 import { PromoBanner } from "@/components/promo-banner"
 import { useOrderStore } from "@/lib/orderStore"
-import { useAdminStore } from "@/lib/adminStore"
 import { FoodItemCard } from "@/components/food-item-card"
 import type { FoodItem, Size } from "@/lib/types"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { MessageCircle } from "lucide-react"
 
 export default function HomePage() {
   const { products, initListener } = useOrderStore()
-  const { listenToPromoBanner } = useAdminStore()
 
   // تشغيل الاستماع لـ Firestore عند فتح الصفحة
   useEffect(() => {
     initListener()
-    const unsubscribeBanner = listenToPromoBanner()
-    return () => {
-      unsubscribeBanner()
-    }
-  }, [initListener, listenToPromoBanner])
+  }, [initListener])
 
   return (
     <main className="container mx-auto px-4 py-6 space-y-8">
@@ -80,18 +71,6 @@ export default function HomePage() {
             <p className="text-gray-500 text-lg">لا توجد منتجات متاحة حالياً.</p>
           </div>
         )}
-      </section>
-
-      {/* سكشن التواصل أسفل الصفحة الرئيسية */}
-      <section className="py-12 flex flex-col items-center justify-center text-center bg-orange-50/50 rounded-2xl border border-orange-100 mt-12" dir="rtl">
-        <h2 className="text-2xl font-bold text-[#b8682b] mb-4">عندك استفسار أو طلب خاص؟</h2>
-        <p className="text-muted-foreground mb-6 max-w-md">إحنا دايماً هنا عشان نسمعك ونظبطلك مزاجك، تواصل معانا في أي وقت.</p>
-        <Button asChild size="lg" className="bg-[#b8682b] hover:bg-[#904a17] text-white px-8 py-6 text-lg font-bold rounded-xl shadow-lg transition-transform hover:scale-105 border-none">
-          <Link href="/contact" className="flex items-center gap-2">
-            <MessageCircle className="w-5 h-5" />
-            تواصل معنا
-          </Link>
-        </Button>
       </section>
 
     </main>

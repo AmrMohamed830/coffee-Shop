@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAdminStore } from '@/lib/adminStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,34 +31,17 @@ async function uploadToCloudinary(file: File): Promise<string> {
 }
 
 export function PromoBannerForm() {
-    const { promoTitle, promoSubtitle, promoImage, isPromoVisible, setPromoText } = useAdminStore();
+    const { promoTitle, promoSubtitle, promoImage, setPromoText } = useAdminStore();
     const [title, setTitle] = useState(promoTitle);
     const [subtitle, setSubtitle] = useState(promoSubtitle);
     const [image, setImage] = useState(promoImage || '');
-    const [isVisible, setIsVisible] = useState(isPromoVisible ?? true);
     const [isUploading, setIsUploading] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    // مزامنة الحقول فور تحميل البيانات من فايربيز
-    useEffect(() => {
-        setTitle(promoTitle);
-        setSubtitle(promoSubtitle);
-        setImage(promoImage || '');
-        setIsVisible(isPromoVisible ?? true);
-    }, [promoTitle, promoSubtitle, promoImage, isPromoVisible]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSaving(true);
-        try {
-            await setPromoText(title, subtitle, image, isVisible);
-            alert('تم تحديث البانر بنجاح لجميع العملاء!');
-        } catch (error) {
-            alert('حدث خطأ أثناء حفظ البانر. تأكد من اتصالك بالإنترنت.');
-        } finally {
-            setIsSaving(false);
-        }
+        setPromoText(title, subtitle, image);
+        alert('تم تحديث البانر بنجاح!');
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,17 +81,6 @@ export function PromoBannerForm() {
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-lg border border-gray-200 dark:border-zinc-700">
-                        <input
-                            type="checkbox"
-                            id="promo-visible"
-                            checked={isVisible}
-                            onChange={(e) => setIsVisible(e.target.checked)}
-                            className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-600 cursor-pointer"
-                        />
-                        <Label htmlFor="promo-visible" className="cursor-pointer text-base font-bold">تفعيل وإظهار البانر للعملاء</Label>
-                    </div>
-
                     <div className="space-y-2">
                         <Label htmlFor="promo-title">العنوان الرئيسي</Label>
                         <Input
@@ -165,8 +137,8 @@ export function PromoBannerForm() {
                             </label>
                         )}
                     </div>
-                    <Button type="submit" disabled={isUploading || isSaving}>
-                        {isUploading ? "جاري الرفع..." : isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+                    <Button type="submit" disabled={isUploading}>
+                        {isUploading ? "جاري الرفع..." : "حفظ التغييرات"}
                     </Button>
                 </form>
             </CardContent>

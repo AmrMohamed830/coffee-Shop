@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAdminStore } from '@/lib/adminStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,28 +37,12 @@ export function PromoBannerForm() {
     const [image, setImage] = useState(promoImage || '');
     const [isVisible, setIsVisible] = useState(isPromoVisible ?? true);
     const [isUploading, setIsUploading] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    // مزامنة الحقول فور تحميل البيانات من فايربيز
-    useEffect(() => {
-        setTitle(promoTitle);
-        setSubtitle(promoSubtitle);
-        setImage(promoImage || '');
-        setIsVisible(isPromoVisible ?? true);
-    }, [promoTitle, promoSubtitle, promoImage, isPromoVisible]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSaving(true);
-        try {
-            await setPromoText(title, subtitle, image, isVisible);
-            alert('تم تحديث البانر بنجاح لجميع العملاء!');
-        } catch (error) {
-            alert('حدث خطأ أثناء حفظ البانر. تأكد من اتصالك بالإنترنت.');
-        } finally {
-            setIsSaving(false);
-        }
+        setPromoText(title, subtitle, image, isVisible);
+        alert('تم تحديث البانر بنجاح!');
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,8 +149,8 @@ export function PromoBannerForm() {
                             </label>
                         )}
                     </div>
-                    <Button type="submit" disabled={isUploading || isSaving}>
-                        {isUploading ? "جاري الرفع..." : isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
+                    <Button type="submit" disabled={isUploading}>
+                        {isUploading ? "جاري الرفع..." : "حفظ التغييرات"}
                     </Button>
                 </form>
             </CardContent>

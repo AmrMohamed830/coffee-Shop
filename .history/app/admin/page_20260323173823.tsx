@@ -201,16 +201,8 @@ export default function AdminDashboard() {
 
   const sortOrders = (ordersList: Order[]) => {
     return [...ordersList].filter(Boolean).sort((a, b) => {
-      // دالة ذكية لاستخراج الوقت بشكل آمن سواء كان Firebase Timestamp أو نص
-      const getSafeTime = (val: any) => {
-        if (!val) return 0;
-        if (typeof val === 'object' && val.seconds) return val.seconds * 1000;
-        const t = new Date(val).getTime();
-        return isNaN(t) ? 0 : t;
-      };
-
-      const dateA = getSafeTime(a?.completedAt || a?.createdAt);
-      const dateB = getSafeTime(b?.completedAt || b?.createdAt);
+      const dateA = new Date(a?.createdAt || 0).getTime()
+      const dateB = new Date(b?.createdAt || 0).getTime()
       
       if (sortOption === 'newest') return dateB - dateA
       if (sortOption === 'oldest') return dateA - dateB
@@ -233,25 +225,13 @@ export default function AdminDashboard() {
 
     if (startDate || endDate) {
       filtered = filtered.filter(order => {
-        const orderDateVal = order?.completedAt || order?.createdAt;
-        if (!orderDateVal) return false;
+        const orderDateStr = order?.completedAt || order?.createdAt
+        if (!orderDateStr) return false
+        const orderDate = new Date(orderDateStr).toISOString().split('T')[0]
         
-        let orderDateObj = new Date(orderDateVal);
-        if (typeof orderDateVal === 'object' && (orderDateVal as any).seconds) {
-          orderDateObj = new Date((orderDateVal as any).seconds * 1000);
-        }
-        
-        if (isNaN(orderDateObj.getTime())) return false;
-        
-        // تنسيق التاريخ محلياً لمنع مشاكل فرق التوقيت مع UTC
-        const year = orderDateObj.getFullYear();
-        const month = String(orderDateObj.getMonth() + 1).padStart(2, '0');
-        const day = String(orderDateObj.getDate()).padStart(2, '0');
-        const orderDateStr = `${year}-${month}-${day}`;
-        
-        if (startDate && orderDateStr < startDate) return false;
-        if (endDate && orderDateStr > endDate) return false;
-        return true;
+        if (startDate && orderDate < startDate) return false
+        if (endDate && orderDate > endDate) return false
+        return true
       })
     }
 
@@ -610,14 +590,13 @@ export default function AdminDashboard() {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4 w-full">
                   <h3 className="text-xl font-bold flex items-center gap-2 text-[var(--admin-text)] whitespace-nowrap"><ShoppingCart size={20}/> الطلبات الحالية</h3>
                   
-                  <div className="w-full lg:w-auto pb-2">
-                    <div className="flex flex-wrap items-center gap-2 md:gap-4">
+                  <div className="w-full lg:w-auto overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    <div className="flex items-center gap-2 md:gap-4 min-w-max">
                     <div className="relative">
                       <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                       <input 
                         type="text" 
-                        autoComplete="nope"
-                        name="active_orders_search_nope"
+                        autoComplete="off"
                         placeholder="بحث برقم الطلب..." 
                         value={orderSearchTerm}
                         onChange={(e) => setOrderSearchTerm(e.target.value)}
@@ -784,8 +763,8 @@ export default function AdminDashboard() {
                   <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-4 w-full">
                     <h3 className="text-xl font-bold flex items-center gap-2 text-[var(--admin-text)] whitespace-nowrap"><History size={20}/> سجل الطلبات المكتملة</h3>
                     
-                    <div className="w-full lg:w-auto pb-2">
-                      <div className="flex flex-wrap items-center gap-2 md:gap-4">
+                    <div className="w-full lg:w-auto overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                      <div className="flex items-center gap-2 md:gap-4 min-w-max">
                       <div className="relative">
                         <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                         <input 
@@ -793,8 +772,7 @@ export default function AdminDashboard() {
                           placeholder="بحث برقم الطلب..." 
                           value={orderSearchTerm}
                           onChange={(e) => setOrderSearchTerm(e.target.value)}
-                          autoComplete="nope"
-                          name="history_orders_search_nope"
+                          autoComplete="off"
                           className="pr-10 pl-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-[var(--admin-text)] text-sm w-48 lg:w-48"
                         />
                         {orderSearchTerm && (
@@ -999,8 +977,7 @@ export default function AdminDashboard() {
                     <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="text"
-                      autoComplete="nope"
-                      name="products_search_nope"
+                      autoComplete="off"
                       placeholder="بحث باسم المنتج..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}

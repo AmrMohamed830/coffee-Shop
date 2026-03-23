@@ -8,13 +8,13 @@ export function Footer() {
           <Link href="/" className="text-xl font-bold">
              بن اّسـر
           </Link>
-          <p className="text-center text-sm text-muted-foreground md:text-right">
+          <p className="text-center text-sm text-muted-foreground md:text-left">
             بِنْبِيع المَزَاج
           </p>
         </div>
         <div className="flex flex-col items-center gap-4 md:items-end">
-          <p className="text-center text-sm text-muted-foreground md:text-left">
-            &copy; {new Date().getFullYear()}  بن اّسـر . جميع الحقوق محفوظة.
+          <p className="text-center text-sm text-muted-foreground md:text-right">
+            &copy; {new Date().getFullYear()}  بن اّسـر . All rights reserved.
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAdminStore } from '@/lib/adminStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,14 +39,6 @@ export function PromoBannerForm() {
     const [isUploading, setIsUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-    // مزامنة الحقول فور تحميل البيانات من فايربيز
-    useEffect(() => {
-        setTitle(promoTitle);
-        setSubtitle(promoSubtitle);
-        setImage(promoImage || '');
-        setIsVisible(isPromoVisible ?? true);
-    }, [promoTitle, promoSubtitle, promoImage, isPromoVisible]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

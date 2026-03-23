@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Amiri } from "next/font/google"
+import { Inter } from "next/font/google"
 import "../styles/globals.css"
 import "../styles/admin-theme.css"
 import { Header } from "@/components/header"
@@ -9,10 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { GlobalProvider } from "@/components/global-provider"
 
-const amiri = Amiri({ 
-  subsets: ["arabic", "latin"],
-  weight: ["400", "700"] // وزن الخط (العادي والعريض)
-})
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "بن آسـر",
@@ -27,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body className={amiri.className}>
+      <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <GlobalProvider>
             <div className="flex min-h-screen flex-col">

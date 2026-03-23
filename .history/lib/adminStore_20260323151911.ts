@@ -1,8 +1,8 @@
 "use client"
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { signInWithEmailAndPassword, onAuthStateChanged, User } from "firebase/auth";
-import { doc, setDoc, onSnapshot } from "firebase/firestore";
-import { auth, db } from "@/config/firebase";
+import { auth } from "@/config/firebase";
 
 interface AdminState {
   isAdminMode: boolean;
@@ -14,16 +14,17 @@ interface AdminState {
   promoSubtitle: string;
   promoImage: string;
   isPromoVisible: boolean;
-  listenToPromoBanner: () => () => void;
   initAuthListener: () => () => void;
   toggleAdminMode: () => void;
   handlePasswordSubmit: (password: string) => Promise<void>;
   closeModal: () => void;
   logout: () => void;
-  setPromoText: (title: string, subtitle: string, image: string, isVisible: boolean) => Promise<void>;
+  setPromoText: (title: string, subtitle: string, image: string, isVisible: boolean) => void;
 }
 
-export const useAdminStore = create<AdminState>((set, get) => ({
+export const useAdminStore = create<AdminState>()(
+  persist(
+    (set, get) => ({
   isAdminMode: false,
   isAccessGranted: false,
   showPasswordModal: false,
@@ -34,30 +35,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   promoImage: "",
   isPromoVisible: true,
 
-  setPromoText: async (title: string, subtitle: string, image: string, isVisible: boolean) => {
-    try {
-      await setDoc(doc(db, 'settings', 'promoBanner'), { title, subtitle, image, isVisible });
-      set({ promoTitle: title, promoSubtitle: subtitle, promoImage: image, isPromoVisible: isVisible });
-    } catch (error) {
-      console.error("Error saving promo banner to Firebase:", error);
-      throw error;
-    }
-  },
-
-  listenToPromoBanner: () => {
-    const unsubscribe = onSnapshot(doc(db, 'settings', 'promoBanner'), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        set({
-          promoTitle: data.title ?? "استمتع بخصم 20% على أول طلب!",
-          promoSubtitle: data.subtitle ?? "استخدم كود \"أهلاً20\" عند الدفع للحصول على خصم خاص.",
-          promoImage: data.image ?? "",
-          isPromoVisible: data.isVisible ?? true
-        });
-      }
-    });
-    return unsubscribe;
-  },
+  setPromoText: (title: string, subtitle: string, image: string, isVisible: boolean) => set({ promoTitle: title, promoSubtitle: subtitle, promoImage: image, isPromoVisible: isVisible }),
 
   initAuthListener: () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -83,20 +61,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   handlePasswordSubmit: async (password: string) => {
     const { userProfile } = get();
-    // نجلب المستخدم مباشرة من Firebase كحل بديل لو الذاكرة أتمسحت بسبب الـ Refresh
-    const currentUser = userProfile || auth.currentUser;
-
     if (!password) {
         set({ passwordError: "الرجاء إدخال كلمة المرور." });
         return;
     }
 
-    if (!currentUser || !currentUser.email) {
+    if (!userProfile || !userProfile.email) {
         set({ passwordError: "لا يمكن التحقق من المستخدم الحالي." });
         return;
     }
     try {
-        await signInWithEmailAndPassword(auth, currentUser.email, password);
+        await signInWithEmailAndPassword(auth, userProfile.email, password);
         set({ isAccessGranted: true, showPasswordModal: false, passwordError: '', isAdminMode: true });
     } catch (error) {
         console.error("Password verification failed:", error);
@@ -116,4 +91,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   logout: () => {
     set({ isAdminMode: false, isAccessGranted: false });
   }
-}));
+    }),
+    {
+      name: "promo-banner-storage",
+      partialize: (state) => ({ promoTitle: state.promoTitle, promoSubtitle: state.promoSubtitle, promoImage: state.promoImage, isPromoVisible: state.isPromoVisible }),
+    }
+  )
+);

@@ -48,12 +48,6 @@ export default function AdminLogin() {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-5" autoComplete="off">
-                    {/* خدعة (Honeypot) لإجبار المتصفح على ملء هذه الحقول الوهمية بدلاً من الحقيقية */}
-                    <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} aria-hidden="true">
-                        <input type="email" name="fake_email_to_prevent_autofill" tabIndex={-1} autoComplete="off" />
-                        <input type="password" name="fake_password_to_prevent_autofill" tabIndex={-1} autoComplete="new-password" />
-                    </div>
-
                     <div>
                         <label className="text-sm font-bold text-gray-700 dark:text-gray-300">البريد الإلكتروني</label>
                         <div className="relative mt-2">
@@ -65,8 +59,7 @@ export default function AdminLogin() {
                                 onChange={(e) => setEmail(e.target.value)} 
                                 required 
                                 autoFocus
-                                autoComplete="nope" 
-                                name="admin_email_nope"
+                                autoComplete="off" 
                                 className="block w-full pr-10 pl-3 py-3 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-primary bg-gray-50 dark:bg-zinc-800 text-black dark:text-white text-sm transition-all" />
                         </div>
                     </div>
@@ -82,7 +75,6 @@ export default function AdminLogin() {
                                 onChange={(e) => setPassword(e.target.value)} 
                                 required 
                                 autoComplete="new-password"
-                                name="admin_password_nope"
                                 className="block w-full pr-10 pl-10 py-3 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-primary bg-gray-50 dark:bg-zinc-800 text-black dark:text-white text-sm transition-all" />
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
                                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">

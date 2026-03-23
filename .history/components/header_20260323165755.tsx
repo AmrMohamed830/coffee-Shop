@@ -20,8 +20,8 @@ export function Header() {
   const totalItems = getCartItemCount()
 
   const routes = [
-    { href: "/", label: "الرئيسية" },
-    { href: "/menu", label: "المنيو" },
+    { href: "/", label: "Home" },
+    { href: "/menu", label: "Menu" },
     { href: "/contact", label: "تواصل معنا" },
   ]
 
@@ -63,7 +63,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
         {pathname.startsWith('/admin') && (
-          <Button variant="outline" size="icon" onClick={handleAdminClick} title="وضع الإدارة">
+          <Button variant="outline" size="icon" onClick={handleAdminClick} title="Admin Mode">
             <Shield className={cn("h-5 w-5", isAccessGranted ? "text-green-500" : "text-destructive")} />
           </Button>
         )}

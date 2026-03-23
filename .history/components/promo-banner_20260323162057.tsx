@@ -33,11 +33,11 @@ export function PromoBanner() {
                     {promoSubtitle}
                 </p>
                 <div className="mt-4">
-                    <Button asChild size="lg" className="bg-[#b8682b] hover:bg-[#904a17] text-white font-bold text-lg px-8 py-6 rounded-xl shadow-lg transition-transform hover:scale-105 border-none">
-                        <Link href="/menu">
+                    <Link href="/menu">
+                        <Button asChild size="lg" className="bg-[#b8682b] hover:bg-[#904a17] text-white font-bold text-lg px-8 py-6 rounded-xl shadow-lg transition-transform hover:scale-105 border-none">
                             اطلب الآن
-                        </Link>
-                    </Button>
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>
