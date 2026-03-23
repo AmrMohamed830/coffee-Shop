@@ -46,7 +46,7 @@ export const StaffPerformance: React.FC<StaffPerformanceProps> = ({ staffSalesLi
                   {staff.name}
                 </td>
                 <td className="py-4 px-4 text-[var(--admin-text)] break-all">{staff.count}</td>
-                <td className="py-4 px-4 text-[var(--admin-text)] font-bold text-green-600">{staff.total.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</td>
+                <td className="py-4 px-4 text-[var(--admin-text)] font-bold text-green-600">{staff.total.toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</td>
               </tr>
             )) : (
               <tr>
