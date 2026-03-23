@@ -119,7 +119,7 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
       set((state) => ({ products: state.products.filter(p => p.id !== productId) }));
     } catch (e: any) {
       console.error("Error removing product: ", e);
-      if (typeof window !== 'undefined') alert(`فشل الحذف!\nالسبب: ${e.message}`);
+      if (typeof window !== 'undefined') alert(`فشل الحذف! تأكد من صلاحيات Firebase وأنك مسجل دخول بحساب أدمن حقيقي.`);
     }
   },
 
@@ -128,18 +128,14 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
       const productRef = doc(db, "products", product.id);
       // استبعاد الـ id من البيانات المرسلة للفايربيز لتجنب أخطاء التحديث
       const { id, ...dataToUpdate } = product;
-      
-      // تنظيف البيانات من أي قيم undefined لأن فايربيز يرفضها وتسبب فشل التعديل
-      const sanitizedData = JSON.parse(JSON.stringify(dataToUpdate));
-      await updateDoc(productRef, sanitizedData);
-
+      await updateDoc(productRef, dataToUpdate);
       // تحديث الحالة محلياً لظهور التعديل فوراً للمستخدم
       set((state) => ({
         products: state.products.map(p => p.id === product.id ? product : p)
       }));
     } catch (e: any) {
       console.error("Error updating product: ", e);
-      if (typeof window !== 'undefined') alert(`فشل التعديل!\nالسبب: ${e.message}`);
+      if (typeof window !== 'undefined') alert(`فشل التعديل! تأكد من صلاحيات Firebase وأنك مسجل دخول بحساب أدمن حقيقي.`);
     }
   },
 }));

@@ -115,31 +115,17 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
   removeProduct: async (productId) => {
     try {
       await deleteDoc(doc(db, "products", productId));
-      // تحديث الحالة محلياً للحذف الفوري من الجدول
-      set((state) => ({ products: state.products.filter(p => p.id !== productId) }));
-    } catch (e: any) {
+    } catch (e) {
       console.error("Error removing product: ", e);
-      if (typeof window !== 'undefined') alert(`فشل الحذف!\nالسبب: ${e.message}`);
     }
   },
 
   updateProduct: async (product) => {
     try {
       const productRef = doc(db, "products", product.id);
-      // استبعاد الـ id من البيانات المرسلة للفايربيز لتجنب أخطاء التحديث
-      const { id, ...dataToUpdate } = product;
-      
-      // تنظيف البيانات من أي قيم undefined لأن فايربيز يرفضها وتسبب فشل التعديل
-      const sanitizedData = JSON.parse(JSON.stringify(dataToUpdate));
-      await updateDoc(productRef, sanitizedData);
-
-      // تحديث الحالة محلياً لظهور التعديل فوراً للمستخدم
-      set((state) => ({
-        products: state.products.map(p => p.id === product.id ? product : p)
-      }));
-    } catch (e: any) {
+      await updateDoc(productRef, product as any);
+    } catch (e) {
       console.error("Error updating product: ", e);
-      if (typeof window !== 'undefined') alert(`فشل التعديل!\nالسبب: ${e.message}`);
     }
   },
 }));

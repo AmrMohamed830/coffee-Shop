@@ -31,7 +31,7 @@
   }
 
   .dark {
-    --background: 13 62% 10%; /* نفس درجة #2a110a بس بنظام HSL */
+    --background: 0 100% 50%; /* خلفية حمراء صريحة */
     --foreground: 45 40% 94%; /* Light beige for contrast */
     --card: 33 100% 7%; /* #241400 */
     --card-foreground: 45 40% 94%;
