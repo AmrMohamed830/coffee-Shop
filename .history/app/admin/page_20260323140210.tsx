@@ -22,7 +22,7 @@ export default function AdminDashboard() {
       if (user) {
         setLoadingAuth(false)
       } else {
-        router.push('/admin-login')
+        router.push('/login')
       }
     })
     return () => unsubscribe()
@@ -66,6 +66,13 @@ export default function AdminDashboard() {
   useEffect(() => {
     initListener()
   }, []) // إزالة التبعية لمنع إعادة التحميل اللانهائي وتجميد الصفحة
+
+  // إجبار المتصفح للعودة للطلبات في حال قفل الصلاحيات
+  useEffect(() => {
+    if (!isAccessGranted) {
+      setActiveTab('orders')
+    }
+  }, [isAccessGranted])
 
   const activeOrders = orders.filter((order) => order && order.status !== 'مكتمل')
   const historyOrders = orders.filter((order) => order && order.status === 'مكتمل')
@@ -282,7 +289,7 @@ export default function AdminDashboard() {
     try {
       await signOut(auth)
       logoutAdmin()
-      router.push('/admin-login')
+      router.push('/login')
     } catch (error) {
       console.error('Error signing out:', error)
     }

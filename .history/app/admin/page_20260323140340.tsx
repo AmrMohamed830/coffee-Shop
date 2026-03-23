@@ -22,7 +22,7 @@ export default function AdminDashboard() {
       if (user) {
         setLoadingAuth(false)
       } else {
-        router.push('/admin-login')
+        router.push('/login')
       }
     })
     return () => unsubscribe()
@@ -282,7 +282,7 @@ export default function AdminDashboard() {
     try {
       await signOut(auth)
       logoutAdmin()
-      router.push('/admin-login')
+      router.push('/login')
     } catch (error) {
       console.error('Error signing out:', error)
     }
