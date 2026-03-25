@@ -4,8 +4,8 @@ export const categories: Category[] = [
   { id: "كلاسـيك", name: "كلاسـيك" },
   { id: "جولـد", name: "جولـد" },
   { id: "اسـبريـسو", name: "اسـبريـسو" },
-  { id: "سبشيال", name: "سبشيال" },
-  { id: "مشتقات القهوة", name: "مشتقات القهوة" },
+  { id: "أخـري", name: "أخـري" },
+ 
 ]
 
 export function getFoodItems(): FoodItem[] {

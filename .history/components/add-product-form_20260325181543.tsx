@@ -44,8 +44,8 @@ async function uploadToCloudinary(file: File): Promise<string> {
 const generateId = () => `food_${new Date().getTime()}`
 
 interface SizeEntry {
-  id: number;
-  name: string;
+  id: number; // for unique key in React state
+  name: string; // e.g., "125g"
   price: number
   image: string
   uploading: boolean
@@ -153,6 +153,7 @@ export function AddProductForm() {
     setSizes(prevSizes => prevSizes.map(size => 
       size.id === id ? { ...size, image: "", preview: "" } : size
     ));
+    // مسح قيمة حقل الإدخال
     const fileInput = fileInputRefs.current[id.toString()];
     if (fileInput) {
       fileInput.value = "";
@@ -187,6 +188,7 @@ export function AddProductForm() {
       blendType: newProduct.blendType,
       categoryId: newProduct.categoryId,
       sizes: validSizes,
+      // حقول التوافق مع عرض القوائم (يستخدم أول حجم كافتراضي)
       price: validSizes[0].price,
       image: validSizes[0].images[0],
       category: categories.find(c => c.id === newProduct.categoryId)?.name || newProduct.categoryId
@@ -268,7 +270,7 @@ export function AddProductForm() {
                       ))}
                     </div>
                   </div>
-                   <div className="md:col-span-2">
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-bold mb-2 text-[var(--admin-text)]">التصنيف</label>
                     <div className="flex gap-2 flex-wrap">
                       {categories.map(category => (

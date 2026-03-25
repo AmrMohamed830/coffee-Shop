@@ -215,7 +215,7 @@ export function EditProductForm({ product, isOpen, onClose }: EditProductFormPro
 
     // استدعاء دالة التحديث (تأكد أن الدالة اسمها updateProduct في الستور الخاص بك)
     if (updateProduct) {
-      updateProduct(updatedProduct);
+      updateProduct(product.id, updatedProduct);
     } else {
       console.error("⚠️ لم يتم العثور على دالة updateProduct في الـ store.");
     }

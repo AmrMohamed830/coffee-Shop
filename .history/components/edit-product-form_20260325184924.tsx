@@ -110,23 +110,6 @@ export function EditProductForm({ product, isOpen, onClose }: EditProductFormPro
     setSizes(loadedSizes);
   }, [product, isOpen]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setNewProduct(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleRoastLevelChange = (level: RoastLevel) => {
-    setNewProduct(prev => ({ ...prev, roastLevel: level }));
-  };
-
-  const handleBlendTypeChange = (type: BlendType) => {
-    setNewProduct(prev => ({ ...prev, blendType: type }));
-  };
-
-  const handleCategoryChange = (value: string) => {
-    setNewProduct(prev => ({ ...prev, categoryId: value }))
-  }
-
   const handleSizeChange = (id: number, field: 'name' | 'price', value: string) => {
     setSizes(prevSizes => prevSizes.map(size => {
       if (size.id === id) {
@@ -215,7 +198,7 @@ export function EditProductForm({ product, isOpen, onClose }: EditProductFormPro
 
     // استدعاء دالة التحديث (تأكد أن الدالة اسمها updateProduct في الستور الخاص بك)
     if (updateProduct) {
-      updateProduct(updatedProduct);
+      updateProduct(product.id, updatedProduct);
     } else {
       console.error("⚠️ لم يتم العثور على دالة updateProduct في الـ store.");
     }
@@ -236,76 +219,6 @@ export function EditProductForm({ product, isOpen, onClose }: EditProductFormPro
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-4 p-1">
-            <h3 className="text-xl font-bold text-center text-[var(--admin-text)] border-b-2 border-[#D8D2C2] pb-2 mb-6">تفاصيل المنتج الأساسية</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-bold mb-2 text-[var(--admin-text)]">اسم نوع البن</label>
-                <input name="name" value={newProduct.name} onChange={handleChange} type="text" className="w-full p-3 rounded-lg border admin-border bg-white/50 dark:bg-gray-800 outline-none focus:ring-2 focus:ring-[#B17457] text-[var(--admin-text)]" placeholder="مثلاً: بن يمني إكسبريسو" required />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2 text-[var(--admin-text)]">درجة التحميص</label>
-                <div className="flex gap-2">
-                  {roastLevels.map(level => (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={() => handleRoastLevelChange(level)}
-                      className={`flex-1 p-3 rounded-lg border transition-colors font-bold ${
-                        newProduct.roastLevel === level
-                          ? 'bg-[#B17457] text-white border-[#B17457]'
-                          : 'bg-white/50 dark:bg-gray-800 admin-border text-[var(--admin-text)] hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {level === "غامق (محروق)" ? "غامق" : level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold mb-2 text-[var(--admin-text)]">التوليفة</label>
-                <div className="flex gap-2">
-                  {blendTypes.map(type => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => handleBlendTypeChange(type)}
-                      className={`flex-1 p-3 rounded-lg border transition-colors font-bold ${
-                        newProduct.blendType === type
-                          ? 'bg-[#B17457] text-white border-[#B17457]'
-                          : 'bg-white/50 dark:bg-gray-800 admin-border text-[var(--admin-text)] hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold mb-2 text-[var(--admin-text)]">التصنيف</label>
-                <div className="flex gap-2 flex-wrap">
-                  {categories.map(category => (
-                    <button
-                      key={category.id}
-                      type="button"
-                      onClick={() => handleCategoryChange(category.id)}
-                      className={`flex-1 min-w-[100px] p-3 rounded-lg border transition-colors font-bold ${
-                        newProduct.categoryId === category.id
-                          ? 'bg-[#B17457] text-white border-[#B17457]'
-                          : 'bg-white/50 dark:bg-gray-800 admin-border text-[var(--admin-text)] hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold mb-2 text-[var(--admin-text)]">وصف النكهة</label>
-                <textarea name="description" value={newProduct.description} onChange={handleChange} className="w-full p-3 rounded-lg border admin-border bg-white/50 dark:bg-gray-800 outline-none h-24 text-[var(--admin-text)]" placeholder="اكتبي تفاصيل الطعم والإيحاءات..."></textarea>
-              </div>
-            </div>
-          </div>
           
           <div className="space-y-8 p-1">
             <h3 className="text-xl font-bold text-center text-[var(--admin-text)] border-b-2 border-[#D8D2C2] pb-2 mb-6">تعديل الأوزان والأسعار</h3>

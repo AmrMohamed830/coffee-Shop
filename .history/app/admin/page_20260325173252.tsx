@@ -7,7 +7,6 @@ import { Coffee, Package, Users, ShoppingCart, BarChart3, History, Trash2, Edit,
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { AddProductForm } from "@/components/add-product-form"
 import { PromoBannerForm } from "@/components/admin/PromoBannerForm";
-import { EditProductForm } from "@/components/edit-product-form"
 import { useOrderStore } from "@/lib/orderStore"
 import { useAdminStore } from "@/lib/adminStore"
 import type { Order, OrderStatus } from "@/lib/types"
@@ -44,7 +43,8 @@ export default function AdminDashboard() {
   const uniqueCustomers = customers || []
 
   const [activeTab, setActiveTab] = useState('orders')
-  const [productToEdit, setProductToEdit] = useState<Product | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState({ name: '', price: 0, sizes: { '50g': 0, '100g': 0, '250g': 0 } })
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOption, setSortOption] = useState('newest')
   const [orderSearchTerm, setOrderSearchTerm] = useState('')
@@ -145,6 +145,58 @@ export default function AdminDashboard() {
   const getStatusColor = (status: string) => {
     const option = statusOptions.find(o => o.value === status)
     return option ? option.color : 'bg-gray-100 text-gray-700'
+  }
+
+  const startEditing = (product: Product) => {
+    setEditingId(product.id)
+    let sizes = { '50g': 0, '100g': 0, '250g': 0 };
+    // @ts-ignore
+    if (product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes)) {
+        sizes = {
+            // @ts-ignore
+            '50g': Number(product.sizes['50g']?.price || 0),
+            // @ts-ignore
+            '100g': Number(product.sizes['100g']?.price || 0),
+            // @ts-ignore
+            '250g': Number(product.sizes['250g']?.price || 0),
+        };
+    // @ts-ignore
+    } else if (Array.isArray(product.sizes)) {
+         // @ts-ignore
+         product.sizes.forEach((s: any) => {
+             if (['50g', '100g', '250g'].includes(s.name)) {
+                 // @ts-ignore
+                 sizes[s.name] = Number(s.price);
+             }
+         });
+         if (sizes['100g'] === 0 && product.price) sizes['100g'] = Number(product.price);
+    } else {
+        sizes['100g'] = Number(product.price);
+    }
+    setEditForm({ name: product.name, price: product.price, sizes })
+  }
+
+  const cancelEditing = () => {
+    setEditingId(null)
+    setEditForm({ name: '', price: 0, sizes: { '50g': 0, '100g': 0, '250g': 0 } })
+  }
+
+  const saveEditing = (originalProduct: Product) => {
+    // @ts-ignore
+    const currentSizes = (originalProduct.sizes && typeof originalProduct.sizes === 'object' && !Array.isArray(originalProduct.sizes)) ? originalProduct.sizes : {};
+    const newSizes = { ...currentSizes };
+    
+    (['50g', '100g', '250g'] as const).forEach(size => {
+        newSizes[size] = {
+            ...(newSizes[size] || {}),
+            price: Number(editForm.sizes[size]),
+            // @ts-ignore
+            image: newSizes[size]?.image || originalProduct.image || "/placeholder.svg"
+        };
+    });
+
+    updateProduct({ ...originalProduct, price: Number(editForm.sizes['100g']), sizes: newSizes })
+    cancelEditing()
   }
 
   const sortOrders = (ordersList: Order[]) => {
@@ -983,25 +1035,68 @@ export default function AdminDashboard() {
                           {product?.name || 'بدون اسم'}
                         </td>
                         <td className="py-4 px-4 text-[var(--admin-text)]">
+                          {editingId === product.id ? (
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs w-8 font-bold">50g:</span>
+                                    <input 
+                                      type="number" 
+                                      value={editForm.sizes['50g'] === 0 ? '' : editForm.sizes['50g']} 
+                                      onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '50g': Number(e.target.value)}})}
+                                      className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs w-8 font-bold">100g:</span>
+                                    <input 
+                                      type="number" 
+                                      value={editForm.sizes['100g'] === 0 ? '' : editForm.sizes['100g']} 
+                                      onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '100g': Number(e.target.value)}})}
+                                      className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs w-8 font-bold">250g:</span>
+                                    <input 
+                                      type="number" 
+                                      value={editForm.sizes['250g'] === 0 ? '' : editForm.sizes['250g']} 
+                                      onChange={(e) => setEditForm({...editForm, sizes: {...editForm.sizes, '250g': Number(e.target.value)}})}
+                                      className="border rounded p-1 w-20 text-[var(--admin-text)] text-sm"
+                                    />
+                                </div>
+                            </div>
+                          ) : (
                               <div className="flex flex-col gap-1 text-sm">
-                              {Array.isArray(product.sizes) && product.sizes.length > 0 ? (
-                                product.sizes.map((s: any, idx: number) => (
-                                  <div key={idx}><span className="text-xs text-gray-500">{s.name}:</span> {Number(s.price).toLocaleString('ar-EG', { numberingSystem: 'latn', style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>
-                                ))
-                              ) : product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes) ? (
-                                ['50g', '100g', '250g'].map(size => {
-                                  const price = Number((product.sizes as any)[size]?.price || 0);
-                                  return price > 0 ? <div key={size}><span className="text-xs text-gray-500">{size}:</span> {price.toLocaleString('ar-EG', { numberingSystem: 'latn', style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div> : null;
-                                })
-                              ) : (
-                                Number(product?.price || 0).toLocaleString('ar-EG', { numberingSystem: 'latn', style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')
-                              )}
+                                  {/* @ts-ignore */}
+                                  {product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes) ? (
+                                      <>
+                                          {/* @ts-ignore */}
+                                          {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                                          {/* @ts-ignore */}
+                                          {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                                          {/* @ts-ignore */}
+                                          {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                                      </>
+                                  ) : (
+                                      Number(product?.price || 0).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')
+                                  )}
                               </div>
+                          )}
                         </td>
                         <td className="py-4 px-4 text-[var(--admin-text)]">{product?.category || '-'}</td>
                         <td className="py-4 px-4 flex gap-2">
+                          {editingId === product.id ? (
                             <>
-                            <button onClick={() => setProductToEdit(product)} className="p-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition" title="تعديل">
+                              <button onClick={() => saveEditing(product)} className="p-2 bg-green-100 text-green-600 rounded hover:bg-green-200 transition" title="حفظ">
+                                <Save size={18} />
+                              </button>
+                              <button onClick={cancelEditing} className="p-2 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition" title="إلغاء">
+                                <X size={18} />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button onClick={() => startEditing(product)} className="p-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition" title="تعديل">
                                 <Edit size={18} />
                               </button>
                               <button 
@@ -1016,6 +1111,7 @@ export default function AdminDashboard() {
                                 <Trash2 size={18} />
                               </button>
                             </>
+                          )}
                         </td>
                       </tr>
                     )) : (
@@ -1026,12 +1122,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-            
-            <EditProductForm 
-              product={productToEdit} 
-              isOpen={!!productToEdit} 
-              onClose={() => setProductToEdit(null)} 
-            />
             </div>
           )}
         </>
