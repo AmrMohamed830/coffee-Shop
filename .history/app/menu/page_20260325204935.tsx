@@ -3,18 +3,19 @@
 import React from "react"
 import { useParams, useRouter } from "next/navigation"
 import { FoodItemGrid } from "@/components/food-item-grid"
+import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-// خريطة لتحويل الكلمات من الرابط إلى قيمها الأصلية في قاعدة البيانات
+// خريطة لتحويل الكلمات من الرابط إلى قيمها الأصلية
 const slugToValue: Record<string, string> = {
   'sada': 'سادة',
   'mohawag': 'محوج',
   'fath': 'فاتح',
   'wast': 'وسط',
   'ghameq': 'غامق (محروق)',
-  'classic': 'كلاسـيك',
-  'gold': 'جولـد',
-  'espresso': 'اسـبريـسو'
+  'classic': 'الكلاسيك',
+  'gold': 'الجولد',
+  'special': 'السبشيال'
 };
 
 export default function SubCategoryPage() {
@@ -23,17 +24,17 @@ export default function SubCategoryPage() {
   const slug = params.slug as string[] || []
 
   // نتوقع الرابط بهذا الشكل: [categoryId, blendType, roastLevel]
-  const [categoryIdSlug, blendTypeSlug, roastLevelSlug] = slug
+  const [categoryId, blendTypeSlug, roastLevelSlug] = slug
 
-  // تحويل الكلمات الإنجليزية من الرابط إلى الكلمات العربية الصحيحة الموجودة في بياناتك
-  const categoryName = slugToValue[categoryIdSlug] || categoryIdSlug
+  // تحويل الكلمات من الرابط إلى أسماء للعرض وقيم للفلترة
+  const categoryName = slugToValue[categoryId] || categoryId
   const blendType = slugToValue[blendTypeSlug] || blendTypeSlug
   const roastLevel = slugToValue[roastLevelSlug] || roastLevelSlug
 
   // شريط التنقل (Breadcrumbs)
   const breadcrumbs = [
     { name: "المنيو", href: "/menu" },
-    { name: categoryName.replace('ـ', ''), href: `/menu` },
+    { name: categoryName, href: `/menu` },
     { name: `${blendType} ${roastLevel}`, href: "#" }
   ]
 
@@ -57,13 +58,12 @@ export default function SubCategoryPage() {
         </div>
       </div>
       
-      <h1 className="text-3xl font-bold mb-8 text-primary">
-        {`منتجات: ${categoryName.replace('ـ', '')} - ${blendType} ${roastLevel.replace(' (محروق)', '')}`}
+      <h1 className="text-3xl font-bold mb-8">
+        {`جميع منتجات: ${categoryName} - ${blendType} ${roastLevel}`}
       </h1>
 
-      {/* استدعاء شبكة المنتجات مع تمرير الفلاتر الصحيحة */}
       <FoodItemGrid 
-        category={categoryName} 
+        category={categoryId} 
         blendType={blendType}
         roastLevel={roastLevel}
       />

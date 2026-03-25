@@ -21,7 +21,7 @@ const slugToValue: Record<string, string> = {
   'classic': 'كلاسـيك',
   'gold': 'جولـد',
   'espresso': 'اسـبريـسو',
-  'special': 'سبشيال',
+  'special': 'السبشيال',
   'coffee-derivatives': 'مشتقات القهوة'
 };
 
@@ -96,12 +96,18 @@ const menuStructure = [
   {
     id: 'اسـبريـسو',
     title: 'إسبريسو',
-    rows: ['فاتح', 'وسط', 'غامق (محروق)']
+    groups: [
+      { title: 'سادة', blendType: 'سادة', rows: ['فاتح', 'وسط', 'غامق (محروق)'] },
+      { title: 'محوج', blendType: 'محوج', rows: ['فاتح', 'وسط', 'غامق (محروق)'] }
+    ]
   },
   {
-    id: 'سبشيال',
+    id: 'السبشيال',
     title: 'السبشيال',
-    rows: ['فاتح', 'وسط', 'غامق (محروق)']
+    groups: [
+      { title: 'سادة', blendType: 'سادة', rows: ['فاتح', 'وسط', 'غامق (محروق)'] },
+      { title: 'محوج', blendType: 'محوج', rows: ['فاتح', 'وسط', 'غامق (محروق)'] }
+    ]
   },
   {
     id: 'مشتقات القهوة',
@@ -122,7 +128,7 @@ const urlFriendly = (text: string) => {
   if (text === 'كلاسـيك') return 'classic';
   if (text === 'جولـد') return 'gold';
   if (text === 'اسـبريـسو') return 'espresso';
-  if (text === 'سبشيال') return 'special';
+  if (text === 'السبشيال') return 'special';
   if (text === 'مشتقات القهوة') return 'coffee-derivatives';
   return text.toLowerCase();
 }
@@ -237,22 +243,6 @@ const urlFriendly = (text: string) => {
                       </div>
                     );
                   })}
-                </div>
-              ) : category.rows ? (
-                // عرض الأقسام التي تحتوي على صفوف مباشرة بدون مجموعات (مثل السبشيال)
-                <div className="grid grid-cols-1 gap-12 px-2 lg:px-6">
-                  <div className="bg-gray-50/50 dark:bg-gray-900/20 rounded-3xl p-4 md:p-8 border border-gray-100 dark:border-gray-800">
-                    <div className="space-y-2">
-                      {category.rows.map(roastLevel => {
-                        const rowItems = categoryItems.filter(item => item.roastLevel === roastLevel);
-                        if (rowItems.length === 0) return null;
-
-                        const displayTitle = roastLevel === 'غامق (محروق)' ? 'غامق' : roastLevel;
-
-                        return <ProductRow key={roastLevel} title={displayTitle} items={rowItems} viewAllLink={`/menu/${urlFriendly(category.id)}`} />;
-                      })}
-                    </div>
-                  </div>
                 </div>
               ) : (
                 // عرض المنتجات مباشرة للأقسام البسيطة التي لا تحتوي على groups

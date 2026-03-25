@@ -10,15 +10,15 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
     // 1. Initialize Auth
     const unsubscribeAuth = useAdminStore.getState().initAuthListener();
     
-    // 2. Initialize Banners
-    const unsubscribeBanners = useAdminStore.getState().listenToBanners();
+    // 2. Initialize Promo Banner
+    const unsubscribeBanner = useAdminStore.getState().listenToPromoBanner();
 
     // 3. Initialize Products & Orders
     useOrderStore.getState().initListener();
     
     return () => {
       if (unsubscribeAuth) unsubscribeAuth();
-      if (unsubscribeBanners) unsubscribeBanners();
+      if (unsubscribeBanner) unsubscribeBanner();
       // products listener is global and usually doesn't need cleanup in this specific architecture 
       // but if we had a products unsubscribe, we'd call it here.
     };

@@ -25,10 +25,10 @@ export default function SubCategoryPage() {
   // نتوقع الرابط بهذا الشكل: [categoryId, blendType, roastLevel]
   const [categoryIdSlug, blendTypeSlug, roastLevelSlug] = slug
 
-  // تحويل الكلمات الإنجليزية من الرابط إلى الكلمات العربية الصحيحة الموجودة في بياناتك
-  const categoryName = slugToValue[categoryIdSlug] || categoryIdSlug
-  const blendType = slugToValue[blendTypeSlug] || blendTypeSlug
-  const roastLevel = slugToValue[roastLevelSlug] || roastLevelSlug
+  // تحويل الكلمات الإنجليزية من الرابط إلى الكلمات العربية
+  const categoryName = slugToValue[categoryIdSlug] || categoryIdSlug || ""
+  const blendType = slugToValue[blendTypeSlug] || blendTypeSlug || ""
+  const roastLevel = slugToValue[roastLevelSlug] || roastLevelSlug || ""
 
   // شريط التنقل (Breadcrumbs)
   const breadcrumbs = [

@@ -10,11 +10,9 @@ interface FoodItemGridProps {
   category?: string | null
   featured?: boolean
   limit?: number
-  blendType?: string | null
-  roastLevel?: string | null
 }
 
-export function FoodItemGrid({ category = null, featured = false, limit, blendType = null, roastLevel = null }: FoodItemGridProps) {
+export function FoodItemGrid({ category = null, featured = false, limit }: FoodItemGridProps) {
   const { products, isProductsLoading } = useOrderStore()
   const [items, setItems] = useState<FoodItem[]>([])
 
@@ -58,7 +56,6 @@ export function FoodItemGrid({ category = null, featured = false, limit, blendTy
         categoryId: product.categoryId || product.category,
         featured: false,
         roastLevel: (product.roastLevel as any) || "وسط",
-        blendType: (product.blendType as any) || "سادة",
         sizes: foodItemSizes
       };
     });
@@ -71,20 +68,12 @@ export function FoodItemGrid({ category = null, featured = false, limit, blendTy
       filteredItems = filteredItems.filter((item) => item.featured)
     }
 
-    if (blendType) {
-      filteredItems = filteredItems.filter((item) => item.blendType === blendType)
-    }
-
-    if (roastLevel) {
-      filteredItems = filteredItems.filter((item) => item.roastLevel === roastLevel)
-    }
-
     if (limit) {
       filteredItems = filteredItems.slice(0, limit)
     }
 
     setItems(filteredItems)
-  }, [category, featured, limit, products, blendType, roastLevel])
+  }, [category, featured, limit, products])
 
   if (isProductsLoading) {
     return (
@@ -98,9 +87,9 @@ export function FoodItemGrid({ category = null, featured = false, limit, blendTy
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12" dir="rtl">
-        <h3 className="text-lg font-medium">لم يتم العثور على منتجات</h3>
-        <p className="text-muted-foreground mt-2">حاول اختيار تصنيف مختلف أو تحقق مرة أخرى لاحقاً.</p>
+      <div className="text-center py-12">
+        <h3 className="text-lg font-medium">No items found</h3>
+        <p className="text-muted-foreground mt-2">Try selecting a different category or check back later.</p>
       </div>
     )
   }

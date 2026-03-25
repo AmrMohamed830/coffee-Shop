@@ -1,7 +1,7 @@
 "use client"
 import { create } from "zustand";
 import { signInWithEmailAndPassword, onAuthStateChanged, User } from "firebase/auth";
-import { doc, setDoc, onSnapshot, collection, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/config/firebase";
 
 interface AdminState {
@@ -10,17 +10,18 @@ interface AdminState {
   showPasswordModal: boolean;
   passwordError: string;
   userProfile: User | null;
-  banners: any[];
-  isBannersLoading: boolean;
-  listenToBanners: () => () => void;
-  addBanner: (bannerData: any) => Promise<void>;
-  updateBanner: (id: string, bannerData: any) => Promise<void>;
-  deleteBanner: (id: string) => Promise<void>;
+  promoTitle: string;
+  promoSubtitle: string;
+  promoImage: string;
+  isPromoVisible: boolean;
+  isPromoLoading: boolean;
+  listenToPromoBanner: () => () => void;
   initAuthListener: () => () => void;
   toggleAdminMode: () => void;
   handlePasswordSubmit: (password: string) => Promise<void>;
   closeModal: () => void;
   logout: () => void;
+  setPromoText: (title: string, subtitle: string, image: string, isVisible: boolean) => Promise<void>;
 }
 
 export const useAdminStore = create<AdminState>((set, get) => ({
@@ -29,46 +30,39 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   showPasswordModal: false,
   passwordError: '',
   userProfile: null,
-  banners: [],
-  isBannersLoading: true,
+  promoTitle: "استمتع بخصم 20% على أول طلب!",
+  promoSubtitle: "استخدم كود \"أهلاً20\" عند الدفع للحصول على خصم خاص.",
+  promoImage: "",
+  isPromoVisible: true,
+  isPromoLoading: true,
 
-  addBanner: async (bannerData) => {
+  setPromoText: async (title: string, subtitle: string, image: string, isVisible: boolean) => {
     try {
-      await addDoc(collection(db, 'banners'), bannerData);
+      await setDoc(doc(db, 'settings', 'promoBanner'), { title, subtitle, image, isVisible });
+      set({ promoTitle: title, promoSubtitle: subtitle, promoImage: image, isPromoVisible: isVisible });
     } catch (error) {
-      console.error("Error adding banner:", error);
+      console.error("Error saving promo banner to Firebase:", error);
       throw error;
     }
   },
 
-  updateBanner: async (id, bannerData) => {
-    try {
-      await updateDoc(doc(db, 'banners', id), bannerData);
-    } catch (error) {
-      console.error("Error updating banner:", error);
-      throw error;
-    }
-  },
-
-  deleteBanner: async (id) => {
-    try {
-      await deleteDoc(doc(db, 'banners', id));
-    } catch (error) {
-      console.error("Error deleting banner:", error);
-      throw error;
-    }
-  },
-
-  listenToBanners: () => {
-    const unsubscribe = onSnapshot(collection(db, 'banners'), (snapshot) => {
-      const bannersList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      set({ banners: bannersList, isBannersLoading: false });
+  listenToPromoBanner: () => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'promoBanner'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        set({
+          promoTitle: data.title ?? "استمتع بخصم 20% على أول طلب!",
+          promoSubtitle: data.subtitle ?? "استخدم كود \"أهلاً20\" عند الدفع للحصول على خصم خاص.",
+          promoImage: data.image ?? "",
+          isPromoVisible: data.isVisible ?? true,
+          isPromoLoading: false
+        });
+      } else {
+        set({ isPromoLoading: false });
+      }
     }, (error) => {
-        console.error("Error fetching banners:", error);
-        set({ isBannersLoading: false });
+        console.error("Error fetching promo banner:", error);
+        set({ isPromoLoading: false });
     });
     return unsubscribe;
   },

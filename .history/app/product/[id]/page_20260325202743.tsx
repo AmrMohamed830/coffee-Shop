@@ -8,7 +8,6 @@ import { useOrderStore } from "@/lib/orderStore"
 import { useCartStore } from "@/lib/store"
 import { formatCurrency, formatImagePath } from "@/lib/utils"
 import { ChevronRight, Minus, Plus, ShoppingCart } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 
 export default function ProductPage() {
   const params = useParams()
@@ -16,8 +15,7 @@ export default function ProductPage() {
   
   // جلب المنتجات من الـ Store الجديد
   const { products, isProductsLoading } = useOrderStore()
-  const { addToCart } = useCartStore()
-  const { toast } = useToast()
+  const { addItem } = useCartStore()
   
   const [product, setProduct] = useState<any>(null)
   const [selectedSize, setSelectedSize] = useState<any>(null)
@@ -91,7 +89,7 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     if (!selectedSize) return;
     
-    addToCart({
+    addItem({
       id: product.id,
       name: product.name,
       price: selectedSize.price,
@@ -101,10 +99,7 @@ export default function ProductPage() {
       description: product.description
     });
     
-    toast({
-      title: "تمت الإضافة للسلة بنجاح 🎉",
-      description: `تم إدراج ${quantity} من ${product.name} (${selectedSize.name})`
-    });
+    alert("تمت الإضافة إلى السلة بنجاح!");
   }
 
   return (

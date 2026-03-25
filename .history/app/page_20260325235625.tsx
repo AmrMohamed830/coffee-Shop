@@ -22,15 +22,6 @@ export default function HomePage() {
   const { banners, isBannersLoading } = useAdminStore()
   const visibleBanners = banners?.filter(b => b.isVisible) || []
 
-  // ترتيب البانرات: البانرات التي لا تحتوي على نصوص (صور فقط) تظهر أولاً
-  const sortedBanners = [...visibleBanners].sort((a, b) => {
-    const aHasText = !!(a.title || a.subtitle);
-    const bHasText = !!(b.title || b.subtitle);
-    if (!aHasText && bHasText) return -1; // الصورة بدون نص تأتي أولاً
-    if (aHasText && !bHasText) return 1;
-    return 0; // الحفاظ على الترتيب الأصلي لباقي البانرات
-  });
-
   return (
     <main className="container mx-auto px-4 py-6 space-y-8">
       {isBannersLoading ? (
@@ -39,18 +30,15 @@ export default function HomePage() {
         <section className="w-full" dir="rtl">
           <Carousel className="w-full" opts={{ loop: visibleBanners.length > 1, direction: 'rtl' }}>
             <CarouselContent>
-              {sortedBanners.map((banner) => (
+              {visibleBanners.map((banner) => (
                 <CarouselItem key={banner.id}>
                   <Card className="overflow-hidden border-0 shadow-sm rounded-2xl">
-                    <CardContent className="flex aspect-[3/4] md:aspect-[16/9] items-center justify-center p-0 relative">
-                      <img src={banner.image || '/placeholder.svg'} alt={banner.title || 'الواجهة الأساسية'} className="w-full h-full object-cover" />
-                      {/* إخفاء الطبقة السوداء والنصوص إذا كان البانر عبارة عن صورة فقط */}
-                      {(banner.title || banner.subtitle) && (
-                        <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center text-white p-4">
-                          {banner.title && <h2 className="text-2xl md:text-5xl font-black drop-shadow-xl">{banner.title}</h2>}
-                          {banner.subtitle && <p className="mt-2 md:mt-4 text-sm md:text-xl drop-shadow-lg font-medium">{banner.subtitle}</p>}
-                        </div>
-                      )}
+                    <CardContent className="flex aspect-[21/9] md:aspect-[4/1] items-center justify-center p-0 relative">
+                      <img src={banner.image || '/placeholder.svg'} alt={banner.title} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center text-white p-4">
+                        <h2 className="text-2xl md:text-5xl font-black drop-shadow-xl">{banner.title}</h2>
+                        {banner.subtitle && <p className="mt-2 md:mt-4 text-sm md:text-xl drop-shadow-lg font-medium">{banner.subtitle}</p>}
+                      </div>
                     </CardContent>
                   </Card>
                 </CarouselItem>

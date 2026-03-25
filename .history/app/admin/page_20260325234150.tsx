@@ -936,11 +936,8 @@ export default function AdminDashboard() {
           {activeTab === 'products' && isAccessGranted && (
             <div className="space-y-8">
               <div className="admin-card">
-                <h3 className="text-xl font-bold mb-6 text-[var(--admin-text)]">إضافة منتجات جديدة</h3>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <AddProductForm type="coffee" />
-                  <AddProductForm type="espresso" />
-                </div>
+                <h3 className="text-xl font-bold mb-4 text-[var(--admin-text)]">إضافة منتج جديد</h3>
+                <AddProductForm />
               </div>
 
               <div className="admin-card overflow-x-auto">

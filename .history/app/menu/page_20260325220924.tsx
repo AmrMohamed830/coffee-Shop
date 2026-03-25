@@ -20,9 +20,7 @@ const slugToValue: Record<string, string> = {
   'ghameq': 'غامق (محروق)',
   'classic': 'كلاسـيك',
   'gold': 'جولـد',
-  'espresso': 'اسـبريـسو',
-  'special': 'سبشيال',
-  'coffee-derivatives': 'مشتقات القهوة'
+  'espresso': 'اسـبريـسو'
 };
 
 // دالة مساعدة لتحويل المنتجات إلى النوع الذي تستخدمه الكروت
@@ -95,18 +93,11 @@ const menuStructure = [
   },
   {
     id: 'اسـبريـسو',
-    title: 'إسبريسو',
-    rows: ['فاتح', 'وسط', 'غامق (محروق)']
-  },
-  {
-    id: 'سبشيال',
-    title: 'السبشيال',
-    rows: ['فاتح', 'وسط', 'غامق (محروق)']
-  },
-  {
-    id: 'مشتقات القهوة',
-    title: 'مشتقات القهوة'
-    // هذا القسم بسيط ولا يحتوي على تقسيمات فرعية مثل نوع الخلطة أو درجة التحميص
+    title: 'إسبريسو وسبشيال',
+    groups: [
+      { title: 'سادة', blendType: 'سادة', rows: ['فاتح', 'وسط', 'غامق (محروق)'] },
+      { title: 'محوج', blendType: 'محوج', rows: ['فاتح', 'وسط', 'غامق (محروق)'] }
+    ]
   }
 ];
 
@@ -122,8 +113,6 @@ const urlFriendly = (text: string) => {
   if (text === 'كلاسـيك') return 'classic';
   if (text === 'جولـد') return 'gold';
   if (text === 'اسـبريـسو') return 'espresso';
-  if (text === 'سبشيال') return 'special';
-  if (text === 'مشتقات القهوة') return 'coffee-derivatives';
   return text.toLowerCase();
 }
 
@@ -176,7 +165,7 @@ const urlFriendly = (text: string) => {
           ))}
         </div>
       </div>
-      <h1 className="text-4xl font-black mb-4 text-center">قائمتنا</h1>
+      <h1 className="text-4xl font-black mb-4 text-center">قائمة منتجاتنا</h1>
       <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">اكتشف مجموعتنا المتنوعة من أجود أنواع البن المحمص بعناية ليناسب كل الأذواق.</p>
       
       {/* استرجاع شريط التصنيفات العلوية */}
@@ -187,9 +176,9 @@ const urlFriendly = (text: string) => {
         />
       </div>
       
-      {slug.length > 0 && <h1 className="text-3xl font-bold mb-8 text-primary">
-        {`${categoryName.replace('ـ', '')} - ${blendType} ${roastLevel.replace(' (محروق)', '')}`}
-      </h1>}
+      <h1 className="text-3xl font-bold mb-8 text-primary">
+        {`منتجات: ${categoryName.replace('ـ', '')} - ${blendType} ${roastLevel.replace(' (محروق)', '')}`}
+      </h1>
       <div className="space-y-12">
         {menuStructure
           .filter(cat => selectedCategory === null || cat.id === selectedCategory)
@@ -209,59 +198,33 @@ const urlFriendly = (text: string) => {
                 <h2 className="text-3xl font-extrabold text-primary">{category.title}</h2>
               </div>
 
-              {/* التحقق إذا كان القسم يحتوي على تقسيمات فرعية (groups) أم لا */}
-              {category.groups ? (
-                <div className="grid grid-cols-1 gap-12 px-2 lg:px-6">
-                  {category.groups.map(group => {
-                    const groupItems = categoryItems.filter(item => item.blendType === group.blendType);
-                    if (groupItems.length === 0) return null;
+              <div className="grid grid-cols-1 gap-12 px-2 lg:px-6">
+                {category.groups.map(group => {
+                  const groupItems = categoryItems.filter(item => item.blendType === group.blendType);
+                  if (groupItems.length === 0) return null;
 
-                    return (
-                      <div key={group.title} className="bg-gray-50/50 dark:bg-gray-900/20 rounded-3xl p-4 md:p-8 border border-gray-100 dark:border-gray-800">
-                        <h3 className="text-2xl font-black mb-6 flex items-center gap-3 text-gray-800 dark:text-gray-100 border-b-2 border-dashed border-gray-200 dark:border-gray-700 pb-4">
-                          <span className="w-3 h-8 bg-primary rounded-full inline-block"></span>
-                          {group.title}
-                        </h3>
-                        
-                        <div className="space-y-2">
-                          {group.rows.map(roastLevel => {
-                            const rowItems = groupItems.filter(item => item.roastLevel === roastLevel);
-                            if (rowItems.length === 0) return null;
+                  return (
+                    <div key={group.title} className="bg-gray-50/50 dark:bg-gray-900/20 rounded-3xl p-4 md:p-8 border border-gray-100 dark:border-gray-800">
+                      <h3 className="text-2xl font-black mb-6 flex items-center gap-3 text-gray-800 dark:text-gray-100 border-b-2 border-dashed border-gray-200 dark:border-gray-700 pb-4">
+                        <span className="w-3 h-8 bg-primary rounded-full inline-block"></span>
+                        قسم الـ {group.title}
+                      </h3>
+                      
+                      <div className="space-y-2">
+                        {group.rows.map(roastLevel => {
+                          const rowItems = groupItems.filter(item => item.roastLevel === roastLevel);
+                          if (rowItems.length === 0) return null;
 
-                            const viewAllLink = `/menu/${urlFriendly(category.id)}/${urlFriendly(group.blendType)}/${urlFriendly(roastLevel)}`;
-                            const displayTitle = roastLevel === 'غامق (محروق)' ? 'غامق' : roastLevel;
+                          const viewAllLink = `/menu/${urlFriendly(category.id)}/${urlFriendly(group.blendType)}/${urlFriendly(roastLevel)}`;
+                          const displayTitle = roastLevel === 'غامق (محروق)' ? 'غامق' : roastLevel;
 
-                            return <ProductRow key={roastLevel} title={displayTitle} items={rowItems} viewAllLink={viewAllLink} />;
-                          })}
-                        </div>
+                          return <ProductRow key={roastLevel} title={displayTitle} items={rowItems} viewAllLink={viewAllLink} />;
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
-              ) : category.rows ? (
-                // عرض الأقسام التي تحتوي على صفوف مباشرة بدون مجموعات (مثل السبشيال)
-                <div className="grid grid-cols-1 gap-12 px-2 lg:px-6">
-                  <div className="bg-gray-50/50 dark:bg-gray-900/20 rounded-3xl p-4 md:p-8 border border-gray-100 dark:border-gray-800">
-                    <div className="space-y-2">
-                      {category.rows.map(roastLevel => {
-                        const rowItems = categoryItems.filter(item => item.roastLevel === roastLevel);
-                        if (rowItems.length === 0) return null;
-
-                        const displayTitle = roastLevel === 'غامق (محروق)' ? 'غامق' : roastLevel;
-
-                        return <ProductRow key={roastLevel} title={displayTitle} items={rowItems} viewAllLink={`/menu/${urlFriendly(category.id)}`} />;
-                      })}
                     </div>
-                  </div>
-                </div>
-              ) : (
-                // عرض المنتجات مباشرة للأقسام البسيطة التي لا تحتوي على groups
-                <div className="px-2 lg:px-6">
-                  <div className="bg-gray-50/50 dark:bg-gray-900/20 rounded-3xl p-4 md:p-8 border border-gray-100 dark:border-gray-800">
-                    <ProductRow title="منتجات متنوعة" items={categoryItems} viewAllLink={`/menu/${urlFriendly(category.id)}`} />
-                  </div>
-                </div>
-              )}
+                  );
+                })}
+              </div>
             </section>
           );
         })}
