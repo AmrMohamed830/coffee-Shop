@@ -10,6 +10,7 @@ export function formatCurrency(amount: number): string {
     style: "currency",
     currency: "EGP",
     maximumFractionDigits: 0,
+    numberingSystem: "latn",
   }).format(amount).replace('ج.م.', 'ج.م')
 }
 

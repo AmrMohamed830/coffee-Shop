@@ -1,5 +1,5 @@
 export interface Size {
-  name: string
+  name: "50g" | "100g" | "250g"
   price: number
   images: string[]
 }
@@ -27,7 +27,7 @@ export interface Product {
   price: number
   image?: string
   category: string
-  sizes?: Size[]
+  sizes?: any
   description?: string
   categoryId?: string
   roastLevel?: string

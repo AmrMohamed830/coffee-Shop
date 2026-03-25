@@ -27,7 +27,7 @@ export interface Product {
   price: number
   image?: string
   category: string
-  sizes?: Size[]
+  sizes?: any
   description?: string
   categoryId?: string
   roastLevel?: string

@@ -44,7 +44,7 @@ export function OrderReceipt({ order, onClose }: OrderReceiptProps) {
           <div className="text-center mb-6 border-b border-dashed border-gray-300 dark:border-gray-700 pb-6">
             <h1 className="text-2xl font-black mb-1">بن آسر</h1>
             <p className="text-sm text-gray-500">رقم الطلب: #{order.id.slice(-4)}</p>
-            <p className="text-sm text-gray-500">التاريخ: {orderDate.toLocaleString('ar-EG')}</p>
+            <p className="text-sm text-gray-500">التاريخ: {orderDate.toLocaleString('ar-EG', { numberingSystem: 'latn' })}</p>
           </div>
 
           {/* بيانات العميل */}

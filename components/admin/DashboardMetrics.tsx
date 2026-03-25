@@ -21,7 +21,7 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({ activeOrders
         <div className="p-3 bg-green-100 rounded-full text-green-600"><Coffee /></div>
         <div>
           <p className="text-sm font-bold text-[var(--admin-text)]">المبيعات اليومية</p>
-          <h3 className="text-2xl font-bold text-[var(--admin-text)]">{dailySales.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</h3>
+          <h3 className="text-2xl font-bold text-[var(--admin-text)]">{dailySales.toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</h3>
         </div>
       </div>
       <div className="admin-card flex items-center gap-4">

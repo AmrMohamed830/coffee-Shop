@@ -76,11 +76,11 @@ export const ProductsList: React.FC<ProductsListProps> = ({
                   <div className="flex flex-col gap-1 text-sm">
                     {product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes) ? (
                       <>
-                        {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
-                        {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
-                        {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                        {Number(product.sizes['50g']?.price) > 0 && <div><span className="text-xs text-gray-500">50g:</span> {Number(product.sizes['50g']?.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                        {Number(product.sizes['100g']?.price) > 0 && <div><span className="text-xs text-gray-500">100g:</span> {Number(product.sizes['100g']?.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
+                        {Number(product.sizes['250g']?.price) > 0 && <div><span className="text-xs text-gray-500">250g:</span> {Number(product.sizes['250g']?.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م')}</div>}
                       </>
-                    ) : (Number(product.price).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م'))}
+                    ) : (Number(product.price).toLocaleString('ar-EG', { numberingSystem: 'latn',  style: 'currency', currency: 'EGP' }).replace('ج.م.', 'ج.م'))}
                   </div>
                 )}
               </td>

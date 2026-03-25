@@ -35,20 +35,26 @@ export default function HomePage() {
               // تحويل بيانات المنتج من Firestore لتناسب شكل الكارت
               let foodItemSizes: Size[] = [];
 
-              // التعامل مع هيكل الأوزان الجديد (مصفوفة) فقط
-              if (Array.isArray(product.sizes) && product.sizes.length > 0) {
-                foodItemSizes = product.sizes.map((s: any) => ({
-                  name: s.name,
-                  price: Number(s.price),
-                  images: (Array.isArray(s.images) && s.images.length > 0) ? s.images : [s.image || "/placeholder.svg"],
-                }));
+              // التعامل مع الـ sizes سواء كان object أو array
+              if (product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes)) {
+                // الـ sizes عبارة عن object مثل { "50g": { price, image }, ... }
+                const sizeOrder: Array<Size["name"]> = ["50g", "100g", "250g"];
+                sizeOrder.forEach(key => {
+                  const sizeData = (product.sizes as Record<string, { price: number; image: string }>)?.[key];
+                  if (sizeData && Number(sizeData.price) > 0) {
+                    foodItemSizes.push({
+                      name: key,
+                      price: Number(sizeData.price),
+                      images: [sizeData.image || "/placeholder.svg"],
+                    });
+                  }
+                });
               }
 
-              // 3. لو لم يتم العثور على أحجام بأي من الطريقتين، نستخدم السعر والصورة الافتراضية للمنتج
+              // لو مفيش أحجام، نستخدم السعر والصورة الافتراضية
               if (foodItemSizes.length === 0) {
                 foodItemSizes = [{ 
-                  // استخدام اسم افتراضي أو ترك فارغاً حسب الحاجة
-                  name: "حجم واحد", 
+                  name: "100g", 
                   price: product.price, 
                   images: [product.image || "/placeholder.svg"] 
                 }];

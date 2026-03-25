@@ -34,14 +34,28 @@ export default function HomePage() {
             {products.map((product) => {
               // تحويل بيانات المنتج من Firestore لتناسب شكل الكارت
               let foodItemSizes: Size[] = [];
-
-              // التعامل مع هيكل الأوزان الجديد (مصفوفة) فقط
+              
+              // 1. التعامل مع الهيكل الجديد (مصفوفة الأحجام)
               if (Array.isArray(product.sizes) && product.sizes.length > 0) {
                 foodItemSizes = product.sizes.map((s: any) => ({
                   name: s.name,
                   price: Number(s.price),
-                  images: (Array.isArray(s.images) && s.images.length > 0) ? s.images : [s.image || "/placeholder.svg"],
+                  images: Array.isArray(s.images) ? s.images : [s.image || "/placeholder.svg"],
                 }));
+              } 
+              // 2. التعامل مع الهيكل القديم كخيار احتياطي (كائن الأحجام)
+              else if (product.sizes && typeof product.sizes === 'object' && !Array.isArray(product.sizes)) {
+                  const sizeOrder: string[] = ["50g", "100g", "250g"];
+                  sizeOrder.forEach(key => {
+                      const sizeData = (product.sizes as Record<string, { price: number; image: string }>)?.[key];
+                      if (sizeData && Number(sizeData.price) > 0) {
+                          foodItemSizes.push({
+                              name: key,
+                              price: Number(sizeData.price),
+                              images: [sizeData.image || "/placeholder.svg"],
+                          });
+                      }
+                  });
               }
 
               // 3. لو لم يتم العثور على أحجام بأي من الطريقتين، نستخدم السعر والصورة الافتراضية للمنتج
